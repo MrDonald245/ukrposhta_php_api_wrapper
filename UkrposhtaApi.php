@@ -145,7 +145,13 @@ class UkrposhtaApi
                 $url = $route[$method];
                 $this->route = $this->substituteUrlWithData($url, $arguments);
 
-                return $this->execute();
+                $result = $this->execute();
+
+                if (isset($result['code']) && isset($result['message'])) {
+                    throw new Exception($result['message']);
+                }
+
+                return $result;
 
             } else {
                 throw new BadMethodCallException(
@@ -219,7 +225,7 @@ class UkrposhtaApi
         $params_count = count($params);
         $url = '';
 
-        // Checks if params quantity are valid
+        // Checks if params quantity are the same as in template
         $tpl_params_count = preg_match_all($pattern, $template_url);
         if ($tpl_params_count != $params_count) {
             throw new InvalidArgumentException(
@@ -229,14 +235,12 @@ class UkrposhtaApi
         // Replace {token} with current token if necessary
         $url = str_replace('{token}', $this->token, $template_url);
 
-        if (!$params_count) {
-            return $template_url;
-        }
-
         // Replace {blocks} with $params
-        $url = preg_replace_callback($pattern, function () use (&$params) {
-            return array_shift($params);
-        }, $url);
+        if ($params_count) {
+            $url = preg_replace_callback($pattern, function () use (&$params) {
+                return array_shift($params);
+            }, $url);
+        }
 
         return $url;
     }

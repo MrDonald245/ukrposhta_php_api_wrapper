@@ -27,17 +27,19 @@ $address = $up_api->method('POST')->params([
 ])->addresses();
 
 $client = $up_api->method('POST')->params([
-    "firstName" => "Евгений",
-    "middleName" => "Константинович",
-    "lastName" => "Бочарников",
-    "uniqueRegistrationNumber" => "0035",
-    "addressId" => $address['id'],
-    "phoneNumber" => "067 123 12 34",
-    "bankCode" => "123000",
-    "bankAccount" => "111000222000999",
-    "resident" => true,
-    "edrpou" => "20053145",
-    "emai" => "test@test.com",
+    'firstName' => 'Евгений',
+    'middleName' => 'Константинович',
+    'lastName' => 'Бочарников',
+    'individual' => true,
+    'uniqueRegistrationNumber' => '0035',
+    'addressId' => $address['id'],
+    'phoneNumber' => '067 123 12 34',
+    'resident' => true,
+    'email' => 'test@test.com',
 ])->clients();
 
-var_dump($client);
+$up_api->method('DELETE')->clients($client['uuid']);
+
+$deleted = $up_api->method('GET')->clients($client['uuid']);
+
+var_dump($deleted);
