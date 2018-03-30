@@ -7,7 +7,7 @@
  */
 
 /**
- * Ukrposhta API class
+ * Ukrposhta API wrapper class
  *
  * @author mrdonald245
  * @method mixed addresses(...$arguments)
@@ -200,8 +200,15 @@ class UkrposhtaApi
         }
 
         $result = curl_exec($ch);
-        if (curl_errno($ch)) {
-            throw new Exception(curl_error($ch));
+        $info = curl_getinfo($ch);
+
+        if ($info['http_code'] != 200) {
+            if (empty($result)) {
+                throw new UkrposhtaApiException('Unexpected error has occurred, may be api token is incorrect');
+            }
+
+            $api_error = $this->xmlErr2Array($result);
+            throw new UkrposhtaApiException($api_error['message'], $api_error['code']);
         }
 
         curl_close($ch);
@@ -252,4 +259,36 @@ class UkrposhtaApi
      * @return string
      */
     private function getFullUrl($route_url) { return self::URL . self::APP_NAME . $route_url; }
+
+    /**
+     * @param string $xml
+     * @return array $arr
+     */
+    private function xmlErr2Array($xml)
+    {
+        $parser = xml_parser_create();
+        $values = [];
+        $index = [];
+        $result = [];
+
+        xml_parse_into_struct($parser, $xml, $values, $index);
+
+        $index_for_ams_code = $index['AMS:CODE'][0];
+        $index_for_ams_message = $index['AMS:MESSAGE'][0];
+        $index_for_ams_description = $index['AMS:DESCRIPTION'][0];
+
+        $result['code'] = $values[$index_for_ams_code]['value'];
+        $result['message'] = $values[$index_for_ams_message]['value'];
+        $result['description'] = $values[$index_for_ams_description]['value'];
+
+        return $result;
+    }
+}
+
+class UkrposhtaApiException extends \Exception
+{
+    public function __construct($message = "", $code = 0, Throwable $previous = null)
+    {
+        parent::__construct($message, $code, $previous);
+    }
 }
