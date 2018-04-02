@@ -10,8 +10,11 @@
  * Ukrposhta API wrapper class
  *
  * @author mrdonald245
- * @method mixed addresses(...$arguments)
- * @method mixed clients(int $client_uuid = null)
+ *
+ * @method array addresses(...$arguments)
+ * @method array clients(int $client_uuid = null)
+ * @method array shipments(int $shipment_uuid = null)
+ * @method array shipmentGroups(int $shipment_group_uuid = null)
  */
 class UkrposhtaApi
 {
@@ -40,7 +43,13 @@ class UkrposhtaApi
             'get' => 'clients/{client_uuid}?token={token}',
             'put' => 'clients/{client_uuid}?token={token}',
             'delete' => 'clients/{client_uuid}?token={token}'
-        ]
+        ],
+        'shipments' => [
+            'post' => 'shipments?token={token}',
+            'get' => 'shipments/{shipment_uuid}?token={token}',
+            'put' => 'shipments/{shipment_uuid}?token={token}',
+            'delete' => 'shipments/{shipment_uuid}?token={token}',
+        ],
     ];
 
     /**
@@ -207,8 +216,19 @@ class UkrposhtaApi
                 throw new UkrposhtaApiException('Unexpected error has occurred, may be api token is incorrect');
             }
 
-            $api_error = $this->xmlErr2Array($result);
-            throw new UkrposhtaApiException($api_error['message'], $api_error['code']);
+            $this->isJson($result)
+                ? $api_error = json_decode($result, true)
+                : $api_error = $this->xmlErr2Array($result);
+
+            isset($api_error['message'])
+                ? $error_message = $api_error['message']
+                : $error_message = 'UkrPoshtaApi unexpected error has occurred';
+
+            isset($api_error['code'])
+                ? $error_code = $this->extractNumberFromStr($api_error['code'])
+                : $error_code = null;
+
+            throw new UkrposhtaApiException($error_message, $error_code);
         }
 
         curl_close($ch);
@@ -230,7 +250,6 @@ class UkrposhtaApi
     {
         $pattern = '/(?!{token}){[\w]+}/'; // {id}, {uu_id} ...
         $params_count = count($params);
-        $url = '';
 
         // Checks if params quantity are the same as in template
         $tpl_params_count = preg_match_all($pattern, $template_url);
@@ -273,15 +292,43 @@ class UkrposhtaApi
 
         xml_parse_into_struct($parser, $xml, $values, $index);
 
-        $index_for_ams_code = $index['AMS:CODE'][0];
-        $index_for_ams_message = $index['AMS:MESSAGE'][0];
-        $index_for_ams_description = $index['AMS:DESCRIPTION'][0];
+        $keys = [];
+        foreach ($index as $key => $item) {
+            $matches = [];
+            preg_match('/\w+:(\w+)/i', $key, $matches);
+            $keys[strtolower($matches[1])] = $matches[0];
+        }
 
-        $result['code'] = $values[$index_for_ams_code]['value'];
-        $result['message'] = $values[$index_for_ams_message]['value'];
-        $result['description'] = $values[$index_for_ams_description]['value'];
+        foreach ($keys as $i => $key) {
+            $index_for_ams = $index[$key][0];
+            if (isset($values[$index_for_ams]['value'])) {
+                $result[$i] = $values[$index_for_ams]['value'];
+            }
+        }
 
         return $result;
+    }
+
+    /**
+     * @param string $string
+     * @return bool
+     */
+    function isJson($string)
+    {
+        json_decode($string);
+        return (json_last_error() == JSON_ERROR_NONE);
+    }
+
+    /**
+     * @param string $str
+     * @return int $number
+     */
+    private function extractNumberFromStr($str)
+    {
+        $matches = [];
+        preg_match('/\d+/', $str, $matches);
+
+        return (int)$matches[0];
     }
 }
 
