@@ -7,7 +7,7 @@
  */
 
 require_once '../UkrposhtaApi.php';
-
+require_once 'UkrPoshtaTestExpectedKeys.php';
 
 class UkrposhtaApiTest extends PHPUnit_Framework_TestCase
 {
@@ -34,7 +34,7 @@ class UkrposhtaApiTest extends PHPUnit_Framework_TestCase
     public function testCreateAddress()
     {
         $address = $this->createAddressesWithApi($this->api);
-        $this->checkAddressKeys($address);
+        $this->checkRequestArrayKeys($address, UkrPoshtaTestExpectedKeys::ADDRESS_VALID_KEYS);
 
         return $address;
     }
@@ -49,7 +49,7 @@ class UkrposhtaApiTest extends PHPUnit_Framework_TestCase
     public function testGetAddress($address)
     {
         $address = $this->api->method('GET')->addresses($address['id']);
-        $this->checkAddressKeys($address);
+        $this->checkRequestArrayKeys($address, UkrPoshtaTestExpectedKeys::ADDRESS_VALID_KEYS);
 
         return $address;
     }
@@ -64,7 +64,7 @@ class UkrposhtaApiTest extends PHPUnit_Framework_TestCase
     public function testCreateClient($address)
     {
         $client = $this->createClientWithApi($this->api, $address);
-        $this->checkClientKeys($client);
+        $this->checkRequestArrayKeys($client, UkrPoshtaTestExpectedKeys::CLIENT_VALID_KEYS);
 
         return $client;
     }
@@ -79,7 +79,7 @@ class UkrposhtaApiTest extends PHPUnit_Framework_TestCase
     public function testGetClient($client)
     {
         $client = $this->api->method('GET')->clients($client['uuid']);
-        $this->checkClientKeys($client);
+        $this->checkRequestArrayKeys($client, UkrPoshtaTestExpectedKeys::CLIENT_VALID_KEYS);
 
         return $client;
     }
@@ -127,7 +127,7 @@ class UkrposhtaApiTest extends PHPUnit_Framework_TestCase
             'parcels' => [['weight' => 1200, 'length' => 170]]
         ])->shipments();
 
-        $this->checkShipmentKeys($shipment);
+        $this->checkRequestArrayKeys($shipment, UkrPoshtaTestExpectedKeys::SHIPMENT_VALID_KEYS);
 
         return $shipment;
     }
@@ -142,7 +142,7 @@ class UkrposhtaApiTest extends PHPUnit_Framework_TestCase
     public function testGetShipment($shipment)
     {
         $shipment = $this->api->method('GET')->shipments($shipment['uuid']);
-        $this->checkShipmentKeys($shipment);
+        $this->checkRequestArrayKeys($shipment, UkrPoshtaTestExpectedKeys::SHIPMENT_VALID_KEYS);
 
         return $shipment;
     }
@@ -173,6 +173,25 @@ class UkrposhtaApiTest extends PHPUnit_Framework_TestCase
 
         $this->api->method('DELETE')->shipments($shipment['uuid']);
         $this->api->method('GET')->shipments($shipment['uuid']);
+    }
+
+    /**
+     * Test creation of a client
+     *
+     * @depends testGetClient
+     * @param array $client
+     * @return array $shipment_group
+     */
+    public function testCreateShipmentsGroup($client)
+    {
+        $shipment_group = $this->api->method('POST')->params([
+            'name' => 'Group 1',
+            'clientUuid' => $client['uuid']
+        ])->shipmentGroups();
+
+        $this->checkRequestArrayKeys($shipment_group, UkrPoshtaTestExpectedKeys::SHIPMENT_GROUP_VALID_KEYS);
+
+        return $shipment_group;
     }
 
     /**
@@ -207,118 +226,14 @@ class UkrposhtaApiTest extends PHPUnit_Framework_TestCase
     /**
      * Checks all required address' keys.
      *
-     * @param $address array
+     * @param array $array
+     * @param array $valid_keys
      */
-    private function checkAddressKeys($address)
+    private function checkRequestArrayKeys($array, $valid_keys)
     {
-        $this->assertArrayHasKey('id', $address);
-        $this->assertArrayHasKey('postcode', $address);
-        $this->assertArrayHasKey('region', $address);
-        $this->assertArrayHasKey('district', $address);
-        $this->assertArrayHasKey('city', $address);
-        $this->assertArrayHasKey('street', $address);
-        $this->assertArrayHasKey('houseNumber', $address);
-        $this->assertArrayHasKey('apartmentNumber', $address);
-        $this->assertArrayHasKey('description', $address);
-        $this->assertArrayHasKey('countryside', $address);
-        $this->assertArrayHasKey('foreignStreetHouseApartment', $address);
-        $this->assertArrayHasKey('detailedInfo', $address);
-        $this->assertArrayHasKey('country', $address);
-    }
-
-    /**
-     * Checks all required client's keys.
-     *
-     * @param array $client
-     */
-    private function checkClientKeys($client)
-    {
-        $this->assertArrayHasKey('uuid', $client);
-        $this->assertArrayHasKey('name', $client);
-        $this->assertArrayHasKey('firstName', $client);
-        $this->assertArrayHasKey('middleName', $client);
-        $this->assertArrayHasKey('lastName', $client);
-        $this->assertArrayHasKey('nameEn', $client);
-        $this->assertArrayHasKey('firstNameEn', $client);
-        $this->assertArrayHasKey('lastNameEn', $client);
-        $this->assertArrayHasKey('postId', $client);
-        $this->assertArrayHasKey('externalId', $client);
-        $this->assertArrayHasKey('uniqueRegistrationNumber', $client);
-        $this->assertArrayHasKey('counterpartyUuid', $client);
-        $this->assertArrayHasKey('addressId', $client);
-        $this->assertArrayHasKey('addresses', $client);
-        $this->assertArrayHasKey('phoneNumber', $client);
-        $this->assertArrayHasKey('phones', $client);
-        $this->assertArrayHasKey('email', $client);
-        $this->assertArrayHasKey('emails', $client);
-        $this->assertArrayHasKey('type', $client);
-        $this->assertArrayHasKey('individual', $client);
-        $this->assertArrayHasKey('edrpou', $client);
-        $this->assertArrayHasKey('bankCode', $client);
-        $this->assertArrayHasKey('bankAccount', $client);
-        $this->assertArrayHasKey('tin', $client);
-        $this->assertArrayHasKey('contactPersonName', $client);
-        $this->assertArrayHasKey('resident', $client);
-    }
-
-    /**
-     * Checks all required shipment's keys.
-     * @param array $shipment
-     */
-    private function checkShipmentKeys($shipment)
-    {
-        $this->arrayHasKey($shipment['uuid']);
-        $this->arrayHasKey($shipment['type']);
-        $this->arrayHasKey($shipment['sender']);
-        $this->arrayHasKey($shipment['recipientPhone']);
-        $this->arrayHasKey($shipment['recipientEmail']);
-        $this->arrayHasKey($shipment['recipientAddressId']);
-        $this->arrayHasKey($shipment['returnAddressId']);
-        $this->arrayHasKey($shipment['shipmentGroupUuid']);
-        $this->arrayHasKey($shipment['externalId']);
-        $this->arrayHasKey($shipment['deliveryType']);
-        $this->arrayHasKey($shipment['packageType']);
-        $this->arrayHasKey($shipment['onFailReceiveType']);
-        $this->arrayHasKey($shipment['barcode']);
-        $this->arrayHasKey($shipment['weight']);
-        $this->arrayHasKey($shipment['length']);
-        $this->arrayHasKey($shipment['width']);
-        $this->arrayHasKey($shipment['height']);
-        $this->arrayHasKey($shipment['declaredPrice']);
-        $this->arrayHasKey($shipment['deliveryPrice']);
-        $this->arrayHasKey($shipment['postPay']);
-        $this->arrayHasKey($shipment['postPayUah']);
-        $this->arrayHasKey($shipment['postPayDeliveryPrice']);
-        $this->arrayHasKey($shipment['currencyCode']);
-        $this->arrayHasKey($shipment['postPayCurrencyCode']);
-        $this->arrayHasKey($shipment['currencyExchangeRate']);
-        $this->arrayHasKey($shipment['discount']);
-        $this->arrayHasKey($shipment['lastModified']);
-        $this->arrayHasKey($shipment['description']);
-        $this->arrayHasKey($shipment['parcels']);
-        $this->arrayHasKey($shipment['direction']);
-        $this->arrayHasKey($shipment['lifecycle']);
-        $this->arrayHasKey($shipment['deliveryDate']);
-        $this->arrayHasKey($shipment['calculationDescription']);
-        $this->arrayHasKey($shipment['international']);
-        $this->arrayHasKey($shipment['paidByRecipient']);
-        $this->arrayHasKey($shipment['postPayPaidByRecipient']);
-        $this->arrayHasKey($shipment['nonCashPayment']);
-        $this->arrayHasKey($shipment['bulky']);
-        $this->arrayHasKey($shipment['fragile']);
-        $this->arrayHasKey($shipment['bees']);
-        $this->arrayHasKey($shipment['recommended']);
-        $this->arrayHasKey($shipment['sms']);
-        $this->arrayHasKey($shipment['toReturnToSender']);
-        $this->arrayHasKey($shipment['documentBack']);
-        $this->arrayHasKey($shipment['checkOnDelivery']);
-        $this->arrayHasKey($shipment['transferPostPayToBankAccount']);
-        $this->arrayHasKey($shipment['deliveryPricePaid']);
-        $this->arrayHasKey($shipment['postPayPaid']);
-        $this->arrayHasKey($shipment['postPayDeliveryPricePaid']);
-        $this->arrayHasKey($shipment['packedBySender']);
-        $this->arrayHasKey($shipment['free']);
-        $this->arrayHasKey($shipment['discountPerClient']);
+        foreach ($valid_keys as $valid_key) {
+            $this->assertArrayHasKey($valid_key, $array);
+        }
     }
 
     /**

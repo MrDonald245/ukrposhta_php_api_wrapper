@@ -50,6 +50,12 @@ class UkrposhtaApi
             'put' => 'shipments/{shipment_uuid}?token={token}',
             'delete' => 'shipments/{shipment_uuid}?token={token}',
         ],
+        'shipmentGroups' => [
+            'post' => 'shipment-groups?token={token}',
+            'get' => 'shipment-groups/{shipment_uuid}?token={token}',
+            'put' => 'shipment-groups/{shipment_uuid}?token={token}',
+            'delete' => 'shipment-groups/{shipment_uuid}?token={token}',
+        ]
     ];
 
     /**
@@ -304,6 +310,12 @@ class UkrposhtaApi
             if (isset($values[$index_for_ams]['value'])) {
                 $result[$i] = $values[$index_for_ams]['value'];
             }
+        }
+
+        if (isset($result['message'])) {
+            isset($result['description'])
+                ? $result['message'] = $result['message'] . '. ' . $result['description']
+                : null;
         }
 
         return $result;
