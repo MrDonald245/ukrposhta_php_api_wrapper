@@ -51,10 +51,13 @@ class UkrposhtaApi
             'delete' => 'shipments/{shipment_uuid}?token={token}',
         ],
         'shipmentGroups' => [
-            'post' => 'shipment-groups?token={token}',
+            'post' => [
+                'create' => 'shipment-groups?token={token}',
+                'addShipment' => 'shipment-groups/{shipmentGroupUuid}/shipments/{shipmentUuid}?token={token}',
+            ],
             'get' => 'shipment-groups/{shipment_uuid}?token={token}',
             'put' => 'shipment-groups/{shipment_uuid}?token={token}',
-            'delete' => 'shipment-groups/{shipment_uuid}?token={token}',
+            'delete' => 'shipments/{shipmentUuid}/shipment-group?token={token}',
         ]
     ];
 
@@ -83,6 +86,15 @@ class UkrposhtaApi
      */
     private $params;
 
+    /**
+     * @var string $callMethodName
+     */
+    private $callMethodName;
+
+    /**
+     * @var string $callUrlName
+     */
+    private $callUrlName;
 
     /**
      * UkrposhtaApi constructor.
@@ -107,6 +119,9 @@ class UkrposhtaApi
         $this->method = $method;
         $this->route = null;
         $this->params = null;
+        $this->callMethodName = null;
+        $this->callUrlName = null;
+
         return $this;
     }
 
@@ -120,6 +135,9 @@ class UkrposhtaApi
     {
         $this->route = $route;
         $this->params = null;
+        $this->callMethodName = null;
+        $this->callUrlName = null;
+
         return $this;
     }
 
@@ -132,7 +150,29 @@ class UkrposhtaApi
     public function params($params)
     {
         $this->params = $params;
+        $this->callMethodName = null;
+        $this->callUrlName = null;
+
         return $this;
+    }
+
+    public function __call($name, $arguments)
+    {
+        $routes = self::ROUTES;
+
+        if (isset($routes[$this->callMethodName])){
+
+        } else if (isset($routes[$name])) {
+            $this->callMethodName = $name;
+
+            return $this;
+        }
+
+        if ($this->route == null) {
+            if ($this->callMethodName != null && $this->callUrlName != null) {
+                $this->route = self::ROUTES[$this->callMethodName][$this->method][$this->callUrlName];
+            }
+        }
     }
 
     /**
@@ -147,35 +187,35 @@ class UkrposhtaApi
      *
      * @return array
      */
-    public function __call($name, $arguments)
-    {
-        $routes = self::ROUTES;
+    /*  public function __call($name, $arguments)
+      {
+          $routes = self::ROUTES;
 
-        // Checks if there is such route
-        if (isset($routes[$name])) {
-            $route = $routes[$name];
-            $method = strtolower($this->method);
+          // Checks if there is such route
+          if (isset($routes[$name])) {
+              $route = $routes[$name];
+              $method = strtolower($this->method);
 
-            if (isset($route[$method])) {
-                $url = $route[$method];
-                $this->route = $this->substituteUrlWithData($url, $arguments);
+              if (isset($route[$method])) {
+                  $url = $route[$method];
+                  $this->route = $this->substituteUrlWithData($url, $arguments);
 
-                $result = $this->execute();
+                  $result = $this->execute();
 
-                if (isset($result['code']) && isset($result['message'])) {
-                    throw new Exception($result['message']);
-                }
+                  if (isset($result['code']) && isset($result['message'])) {
+                      throw new Exception($result['message']);
+                  }
 
-                return $result;
+                  return $result;
 
-            } else {
-                throw new BadMethodCallException(
-                    "Requested method $this->method is unavailable in Nova Poshta API");
-            }
-        } else {
-            throw new BadMethodCallException("There is no such method as $name");
-        }
-    }
+              } else {
+                  throw new BadMethodCallException(
+                      "Requested method $this->method is unavailable in Nova Poshta API");
+              }
+          } else {
+              throw new BadMethodCallException("There is no such method as $name");
+          }
+      }*/
 
     /**
      * Execute request to UkrPoshta API

@@ -195,6 +195,55 @@ class UkrposhtaApiTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * Test of getting a shipment group
+     *
+     * @depends testCreateShipmentsGroup
+     * @param array $shipment_group
+     * @return array
+     */
+    public function testGetShipmentGroup($shipment_group)
+    {
+        $shipment_group = $this->api->method('GET')->shipmentGroups($shipment_group['uuid']);
+        $this->checkRequestArrayKeys($shipment_group, UkrPoshtaTestExpectedKeys::SHIPMENT_GROUP_VALID_KEYS);
+
+        return $shipment_group;
+    }
+
+    /**
+     * Test of changing a shipment group
+     *
+     * @depends testGetShipmentGroup
+     * @param array $shipment_group
+     * @return array $shipment_group
+     */
+    public function testChangeShipmentGroup($shipment_group)
+    {
+        $shipment_group = $this->api->method('PUT')
+            ->params(['name' => 'Eugene'])->shipmentGroups($shipment_group['uuid']);
+
+        $this->assertEquals('Eugene', $shipment_group['name']);
+
+        return $shipment_group;
+    }
+
+    public function testCall()
+    {
+        $this->api->method('POST')->shipmentGroups();
+    }
+
+    /**
+     * Test of deleting a shipment group
+     *
+     * @depends testGetShipment
+     * @param $shipment
+     */
+    public function testDeleteShipmentGroup($shipment)
+    {
+        $this->api->method('DELETE')->shipmentGroups($shipment['uuid']);
+        $shipment = $this->api->method('GET')->shipmentGroups($shipment['uuid']);
+    }
+
+    /**
      * Check an exception if wrong bearer is used
      */
     public function testWrongBearer()
