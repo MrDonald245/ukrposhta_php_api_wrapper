@@ -112,21 +112,7 @@ class UkrposhtaApiTest extends PHPUnit_Framework_TestCase
      */
     public function testCreateShipment()
     {
-        $sender_address = $this->createAddressesWithApi($this->api);
-        $recipient_address = $this->createAddressesWithApi($this->api);
-
-        $sender_uuid = $this->createClientWithApi($this->api, $sender_address)['uuid'];
-        $recipient_uuid = $this->createClientWithApi($this->api, $recipient_address)['uuid'];
-
-        $shipment = $this->api->method('POST')->params([
-            'sender' => ['uuid' => $sender_uuid],
-            'recipient' => ['uuid' => $recipient_uuid],
-            'deliveryType' => 'W2D',
-            'paidByRecipient' => 'true',
-            'nonCashPayment' => 'false',
-            'parcels' => [['weight' => 1200, 'length' => 170]]
-        ])->shipments();
-
+        $shipment = $this->createShipmentWithApi($this->api);
         $this->checkRequestArrayKeys($shipment, UkrPoshtaTestExpectedKeys::SHIPMENT_VALID_KEYS);
 
         return $shipment;
@@ -178,18 +164,25 @@ class UkrposhtaApiTest extends PHPUnit_Framework_TestCase
     /**
      * Test creation of a client
      *
-     * @depends testGetClient
-     * @param array $client
      * @return array $shipment_group
      */
-    public function testCreateShipmentsGroup($client)
+    public function testCreateShipmentsGroup()
     {
-        $shipment_group = $this->api->method('POST')->params([
-            'name' => 'Group 1',
-            'clientUuid' => $client['uuid']
-        ])->shipmentGroups();
-
+        $shipment_group = $this->createShipmentGroupWithApi($this->api);
         $this->checkRequestArrayKeys($shipment_group, UkrPoshtaTestExpectedKeys::SHIPMENT_GROUP_VALID_KEYS);
+
+        return $shipment_group;
+    }
+
+
+    public function testAddingShipmentToShipmentGroup()
+    {
+        $shipment = $this->createShipmentWithApi($this->api);
+        $shipment_group = $this->createShipmentGroupWithApi($this->api);
+
+        $this->api->method('POST')
+            ->action('addShipment')
+            ->shipmentGroups($shipment_group['uuid'], $shipment['uuid']);
 
         return $shipment_group;
     }
@@ -203,7 +196,7 @@ class UkrposhtaApiTest extends PHPUnit_Framework_TestCase
      */
     public function testGetShipmentGroup($shipment_group)
     {
-        $shipment_group = $this->api->method('GET')->shipmentGroups($shipment_group['uuid']);
+        $shipment_group = $this->api->method('GET')->action('get')->shipmentGroups($shipment_group['uuid']);
         $this->checkRequestArrayKeys($shipment_group, UkrPoshtaTestExpectedKeys::SHIPMENT_GROUP_VALID_KEYS);
 
         return $shipment_group;
@@ -226,21 +219,19 @@ class UkrposhtaApiTest extends PHPUnit_Framework_TestCase
         return $shipment_group;
     }
 
-    public function testCall()
-    {
-        $this->api->method('POST')->shipmentGroups();
-    }
-
     /**
      * Test of deleting a shipment group
      *
-     * @depends testGetShipment
-     * @param $shipment
      */
-    public function testDeleteShipmentGroup($shipment)
+    public function testDeleteShipmentFromShipmentGroup()
     {
+        $shipment_group = $this->createShipmentGroupWithApi($this->api);
+        $shipment = $this->createShipmentWithApi($this->api);
+        $this->api->method('POST')
+            ->action('addShipment')
+            ->shipmentGroups($shipment_group['uuid'], $shipment['uuid']);
+
         $this->api->method('DELETE')->shipmentGroups($shipment['uuid']);
-        $shipment = $this->api->method('GET')->shipmentGroups($shipment['uuid']);
     }
 
     /**
@@ -325,5 +316,46 @@ class UkrposhtaApiTest extends PHPUnit_Framework_TestCase
             'resident' => true,
             'email' => 'test@test.com',
         ])->clients();
+    }
+
+    /**
+     * @param UkrposhtaApi $api
+     * @return array $shipment
+     */
+    private function createShipmentWithApi($api)
+    {
+        $sender_address = $this->createAddressesWithApi($api);
+        $recipient_address = $this->createAddressesWithApi($api);
+
+        $sender_uuid = $this->createClientWithApi($api, $sender_address)['uuid'];
+        $recipient_uuid = $this->createClientWithApi($api, $recipient_address)['uuid'];
+
+        $shipment = $api->method('POST')->params([
+            'sender' => ['uuid' => $sender_uuid],
+            'recipient' => ['uuid' => $recipient_uuid],
+            'deliveryType' => 'W2D',
+            'paidByRecipient' => 'true',
+            'nonCashPayment' => 'false',
+            'parcels' => [['weight' => 1200, 'length' => 170]]
+        ])->shipments();
+
+        return $shipment;
+    }
+
+    /**
+     * @param UkrposhtaApi $api
+     * @return array $shipment_group
+     */
+    private function createShipmentGroupWithApi($api)
+    {
+        $address = $this->createAddressesWithApi($api);
+        $client = $this->createClientWithApi($api, $address);
+
+        $shipment_group = $this->api->method('POST')->action('create')->params([
+            'name' => 'Group 1',
+            'clientUuid' => $client['uuid']
+        ])->shipmentGroups();
+
+        return $shipment_group;
     }
 }

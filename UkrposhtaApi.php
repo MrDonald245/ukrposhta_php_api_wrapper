@@ -14,7 +14,7 @@
  * @method array addresses(...$arguments)
  * @method array clients(int $client_uuid = null)
  * @method array shipments(int $shipment_uuid = null)
- * @method array shipmentGroups(int $shipment_group_uuid = null)
+ * @method array shipmentGroups(...$arguments)
  */
 class UkrposhtaApi
 {
@@ -55,7 +55,10 @@ class UkrposhtaApi
                 'create' => 'shipment-groups?token={token}',
                 'addShipment' => 'shipment-groups/{shipmentGroupUuid}/shipments/{shipmentUuid}?token={token}',
             ],
-            'get' => 'shipment-groups/{shipment_uuid}?token={token}',
+            'get' => [
+                'get' => 'shipment-groups/{shipment_group_uuid}?token={token}',
+                'getByClientUuid' => 'shipment-groups/clients/{clientUuid}?token={token}',
+            ],
             'put' => 'shipment-groups/{shipment_uuid}?token={token}',
             'delete' => 'shipments/{shipmentUuid}/shipment-group?token={token}',
         ]
@@ -87,14 +90,9 @@ class UkrposhtaApi
     private $params;
 
     /**
-     * @var string $callMethodName
+     * @var string $action
      */
-    private $callMethodName;
-
-    /**
-     * @var string $callUrlName
-     */
-    private $callUrlName;
+    private $action;
 
     /**
      * UkrposhtaApi constructor.
@@ -119,9 +117,18 @@ class UkrposhtaApi
         $this->method = $method;
         $this->route = null;
         $this->params = null;
-        $this->callMethodName = null;
-        $this->callUrlName = null;
+        $this->action = null;
 
+        return $this;
+    }
+
+    /**
+     * @param string $action
+     * @return $this
+     */
+    public function action($action)
+    {
+        $this->action = $action;
         return $this;
     }
 
@@ -135,8 +142,7 @@ class UkrposhtaApi
     {
         $this->route = $route;
         $this->params = null;
-        $this->callMethodName = null;
-        $this->callUrlName = null;
+        $this->action = null;
 
         return $this;
     }
@@ -150,29 +156,7 @@ class UkrposhtaApi
     public function params($params)
     {
         $this->params = $params;
-        $this->callMethodName = null;
-        $this->callUrlName = null;
-
         return $this;
-    }
-
-    public function __call($name, $arguments)
-    {
-        $routes = self::ROUTES;
-
-        if (isset($routes[$this->callMethodName])){
-
-        } else if (isset($routes[$name])) {
-            $this->callMethodName = $name;
-
-            return $this;
-        }
-
-        if ($this->route == null) {
-            if ($this->callMethodName != null && $this->callUrlName != null) {
-                $this->route = self::ROUTES[$this->callMethodName][$this->method][$this->callUrlName];
-            }
-        }
     }
 
     /**
@@ -187,35 +171,62 @@ class UkrposhtaApi
      *
      * @return array
      */
-    /*  public function __call($name, $arguments)
-      {
-          $routes = self::ROUTES;
+    public function __call($name, $arguments)
+    {
+        $routes = self::ROUTES;
 
-          // Checks if there is such route
-          if (isset($routes[$name])) {
-              $route = $routes[$name];
-              $method = strtolower($this->method);
+        // Checks if there is such route
+        if (isset($routes[$name])) {
+            $route = $routes[$name];
+            $method = strtolower($this->method);
 
-              if (isset($route[$method])) {
-                  $url = $route[$method];
-                  $this->route = $this->substituteUrlWithData($url, $arguments);
+            if (isset($route[$method])) {
+                $action = $route[$method];
+                $url = '';
 
-                  $result = $this->execute();
+                if (is_array($action)) {
+                    $action_size = sizeof($action);
+                    if ($action_size > 1) {
+                        if (empty($this->action)) {
+                            $actions_in_string = '';
 
-                  if (isset($result['code']) && isset($result['message'])) {
-                      throw new Exception($result['message']);
-                  }
+                            foreach ($action as $key => $value) {
+                                $actions_in_string .= '"' . $key . '"' . '; ';
+                            }
 
-                  return $result;
+                            throw new UkrposhtaApiException(
+                                "You should choose one of $action_size actions: $actions_in_string");
+                        } else {
+                            if (isset($action[$this->action])) {
+                                $url = $action[$this->action];
+                            } else {
+                                throw new UkrposhtaApiException(
+                                    "There is no such action as \"$this->action\"");
+                            }
+                        }
+                    }
+                } else if (is_string($action)) {
+                    $url = $action;
+                }
 
-              } else {
-                  throw new BadMethodCallException(
-                      "Requested method $this->method is unavailable in Nova Poshta API");
-              }
-          } else {
-              throw new BadMethodCallException("There is no such method as $name");
-          }
-      }*/
+                $this->route = $this->substituteUrlWithData($url, $arguments);
+
+                $result = $this->execute();
+
+                if (isset($result['code']) && isset($result['message'])) {
+                    throw new Exception($result['message']);
+                }
+
+                return $result;
+
+            } else {
+                throw new BadMethodCallException(
+                    "Requested method $this->method is unavailable in Nova Poshta API");
+            }
+        } else {
+            throw new BadMethodCallException("There is no such method as $name");
+        }
+    }
 
     /**
      * Execute request to UkrPoshta API
