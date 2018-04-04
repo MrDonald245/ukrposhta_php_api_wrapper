@@ -320,6 +320,23 @@ class UkrposhtaApiTest extends PHPUnit_Framework_TestCase
 
     /**
      * @param UkrposhtaApi $api
+     * @return array $shipment_group
+     */
+    private function createShipmentGroupWithApi($api)
+    {
+        $address = $this->createAddressesWithApi($api);
+        $client = $this->createClientWithApi($api, $address);
+
+        $shipment_group = $this->api->method('POST')->action('create')->params([
+            'name' => 'Group 1',
+            'clientUuid' => $client['uuid']
+        ])->shipmentGroups();
+
+        return $shipment_group;
+    }
+
+    /**
+     * @param UkrposhtaApi $api
      * @return array $shipment
      */
     private function createShipmentWithApi($api)
@@ -340,22 +357,5 @@ class UkrposhtaApiTest extends PHPUnit_Framework_TestCase
         ])->shipments();
 
         return $shipment;
-    }
-
-    /**
-     * @param UkrposhtaApi $api
-     * @return array $shipment_group
-     */
-    private function createShipmentGroupWithApi($api)
-    {
-        $address = $this->createAddressesWithApi($api);
-        $client = $this->createClientWithApi($api, $address);
-
-        $shipment_group = $this->api->method('POST')->action('create')->params([
-            'name' => 'Group 1',
-            'clientUuid' => $client['uuid']
-        ])->shipmentGroups();
-
-        return $shipment_group;
     }
 }
