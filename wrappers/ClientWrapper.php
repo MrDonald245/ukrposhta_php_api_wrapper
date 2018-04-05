@@ -7,6 +7,7 @@
  */
 
 require_once 'UkrposhtaApiWrapper.php';
+require_once 'entities/Client.php';
 
 /**
  * Class ClientWrapper is used for working with Ukrposhta API client.
@@ -22,8 +23,15 @@ class ClientWrapper extends UkrposhtaApiWrapper
         parent::__construct($bearer, $token);
     }
 
-    public function create()
+    /**
+     * @param Client|array $client
+     * @return Client
+     */
+    public function create($client)
     {
+        $data = parent::entityToArray($client);
+        $client_array = $this->api->method('POST')->params($data)->clients();
 
+        return new Client($client_array);
     }
 }

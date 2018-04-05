@@ -103,12 +103,16 @@ class Address extends EntityBase
     /**
      * EntityBase constructor.
      *
-     * @param array|null $array_data
+     * @param array|string|null data
      */
-    public function __construct($array_data = null)
+    public function __construct($data = null)
     {
-        if ($array_data != null) {
-            $this->initWithArray($array_data);
+        if (is_string($data)) {
+            $data = json_decode($data, true);
+        }
+
+        if ($data != null) {
+            $this->initWithArray($data);
         }
     }
 

@@ -13,9 +13,9 @@ abstract class EntityBase
     /**
      * EntityBase constructor.
      *
-     * @param array|null $array_data
+     * @param array|string|null $data Could be as an array, json, or null
      */
-    abstract function __construct($array_data = null);
+    abstract function __construct($data = null);
 
     /**
      * @param array $data
