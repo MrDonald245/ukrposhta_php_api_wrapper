@@ -1,24 +1,24 @@
 <?php
 /**
- * Created by PhpStorm.
+ * Created by Eugene.
  * User: eugene
- * Date: 04/04/18
- * Time: 14:53
+ * Date: 05/04/18
+ * Time: 10:48
  */
 
-require_once '../UkrposhtaApiWrapper.php';
-require_once '../UkrposhtaApi.php';
+require_once '../../wrappers/AddressWrapper.php';
+require_once '../../kernel/UkrposhtaApi.php';
 
-class UkrposhtaApiWrapperTest extends PHPUnit_Framework_TestCase
+class AddressWrapperTest extends PHPUnit_Framework_TestCase
 {
     /**
-     * @var UkrposhtaApiWrapper
+     * @var AddressWrapper
      */
     private $wrapper;
 
-    protected function setUp()
+    public function setUp()
     {
-        $this->wrapper = new UkrposhtaApiWrapper(
+        $this->wrapper = new AddressWrapper(
             'f9027fbb-cf33-3e11-84bb-5484491e2c94',
             'ba5378df-985e-49c5-9cf3-d222fa60aa68');
     }
@@ -34,7 +34,8 @@ class UkrposhtaApiWrapperTest extends PHPUnit_Framework_TestCase
             'houseNumber' => '12',
             'apartmentNumber' => '33'];
 
-        $this->wrapper->createAddress($address_data);
+        $address = $this->wrapper->address()->create($address_data);
+        $this->assertEquals('Київський', $address->getDistrict());
     }
 
     public function testCreateAddressWithEntity()
@@ -48,6 +49,19 @@ class UkrposhtaApiWrapperTest extends PHPUnit_Framework_TestCase
             'houseNumber' => '12',
             'apartmentNumber' => '33']);
 
-        $address = $this->wrapper->createAddress($address);
+        $address = $this->wrapper->address()->create($address);
+        $this->assertEquals('Київський', $address->getDistrict());
+
+        return $address;
+    }
+
+    /**
+     * @depends testCreateAddressWithEntity
+     * @param Address $address
+     */
+    public function testGetAddressById($address)
+    {
+        $address = $this->wrapper->address()->getById($address->getId());
+        $this->assertEquals('Київський', $address->getDistrict());
     }
 }

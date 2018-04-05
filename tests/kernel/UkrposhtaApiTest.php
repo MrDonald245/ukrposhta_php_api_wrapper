@@ -6,7 +6,7 @@
  * Time: 09:27
  */
 
-require_once '../UkrposhtaApi.php';
+require_once '../../kernel/UkrposhtaApi.php';
 require_once 'UkrPoshtaTestExpectedKeys.php';
 
 class UkrposhtaApiTest extends PHPUnit_Framework_TestCase

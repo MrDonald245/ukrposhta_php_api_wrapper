@@ -6,7 +6,7 @@
  * Time: 14:04
  */
 
-require_once '../entities/Address.php';
+require_once '../../../wrappers/entities/Address.php';
 
 class AddressTest extends PHPUnit_Framework_TestCase
 {

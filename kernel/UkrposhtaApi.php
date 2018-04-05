@@ -107,6 +107,22 @@ class UkrposhtaApi
     }
 
     /**
+     * @return string
+     */
+    public function getToken()
+    {
+        return $this->token;
+    }
+
+    /**
+     * @return string
+     */
+    public function getBearer()
+    {
+        return $this->bearer;
+    }
+
+    /**
      * Set method and empties params properties
      *
      * @param string $method by default it is POST
