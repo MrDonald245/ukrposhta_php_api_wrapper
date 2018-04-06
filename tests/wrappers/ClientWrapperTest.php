@@ -9,17 +9,18 @@
 require_once '../../wrappers/ClientWrapper.php';
 require_once '../../wrappers/entities/Client.php';
 require_once '../../kernel/UkrposhtaApi.php';
+require_once '../../wrappers/UkrposhtaApiWrapper.php';
 
 class ClientWrapperTest extends PHPUnit_Framework_TestCase
 {
     /**
-     * @var clientWrapper
+     * @var UkrposhtaApiWrapper
      */
     private $wrapper;
 
     public function setUp()
     {
-        $this->wrapper = new clientWrapper(
+        $this->wrapper = new UkrposhtaApiWrapper(
             'f9027fbb-cf33-3e11-84bb-5484491e2c94',
             'ba5378df-985e-49c5-9cf3-d222fa60aa68');
     }
@@ -64,6 +65,7 @@ class ClientWrapperTest extends PHPUnit_Framework_TestCase
     /**
      * @depends testCreateAddress
      * @param Address $address
+     * @return Client $client
      */
     public function testCreateClientWithEntity($address)
     {
@@ -78,5 +80,79 @@ class ClientWrapperTest extends PHPUnit_Framework_TestCase
 
         $client = $this->wrapper->client()->create($client);
         $this->assertEquals('0035', $client->getUniqueRegistrationNumber());
+
+        return $client;
+    }
+
+    /**
+     * @depends testCreateClientWithEntity
+     * @param Client $client
+     */
+    public function testGetClientById($client)
+    {
+        $client = $this->wrapper->client()->getById($client->getUuid());
+        $this->assertEquals('test@test.com', $client->getEmail());
+    }
+
+    /**
+     * @depends testCreateClientWithEntity
+     * @param Client $client
+     */
+    public function testGetClientByExternalId($client)
+    {
+        $client->setExternalId(1);
+        $result_client = $this->wrapper->client()->getByExternalId($client->getExternalId());
+        $this->assertEquals(1, $result_client->getExternalId());
+    }
+
+    /**
+     * @depends testCreateClientWithEntity
+     * @param Client $client
+     */
+    public function testGetAllClientsPhones($client)
+    {
+        $array_phones = $this->wrapper->client()->getAllPhones($client->getUuid())[0];
+
+        $this->assertArrayHasKey('uuid', $array_phones);
+        $this->assertArrayHasKey('phoneNumber', $array_phones);
+        $this->assertArrayHasKey('type', $array_phones);
+        $this->assertArrayHasKey('main', $array_phones);
+    }
+
+    /**
+     * @depends testCreateClientWithEntity
+     * @param Client $client
+     * @return Client $client_with_new_phones
+     */
+    public function testAddPhone($client)
+    {
+        $client_with_new_phones = $this->wrapper->client()
+            ->addPhone($client->getUuid(), '+38099999999');
+
+        $amount_of_phones = sizeof($client_with_new_phones->getPhones());
+
+        $this->assertEquals(2, $amount_of_phones);
+
+        return $client_with_new_phones;
+    }
+
+    /**
+     * @depends testAddPhone
+     * @param Client $client
+     */
+    public function testDeletePhone($client)
+    {
+        $phone_amount_before_deleting = sizeof($client->getPhones());
+
+        foreach ($client->getPhones() as $phone) {
+            if ($phone['main'] == false) {
+                $new_phone_uuid = $phone['uuid'];
+            }
+        }
+
+        $this->wrapper->client()->deletePhone($new_phone_uuid);
+
+        $phone_amount_after_deleting = $this->wrapper->client()->getAllPhones($client->getUuid());
+        $this->assertEquals(false, $phone_amount_after_deleting == $phone_amount_before_deleting);
     }
 }

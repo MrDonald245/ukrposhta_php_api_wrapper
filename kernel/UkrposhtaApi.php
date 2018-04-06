@@ -12,8 +12,8 @@
  * @author mrdonald245
  *
  * @method array addresses(...$arguments)
- * @method array clients(int $client_uuid = null)
- * @method array shipments(int $shipment_uuid = null)
+ * @method array clients(...$arguments)
+ * @method array shipments(...$arguments)
  * @method array shipmentGroups(...$arguments)
  */
 class UkrposhtaApi
@@ -40,9 +40,16 @@ class UkrposhtaApi
         ],
         'clients' => [
             'post' => 'clients?token={token}',
-            'get' => 'clients/{client_uuid}?token={token}',
+            'get' => [
+                'getById' => 'clients/{client_uuid}?token={token}',
+                'getByExternalId' => 'clients/external-id/{externalId}?token={token}',
+                'getAllPhones' => 'client-phones?token={token}&clientUuid={clientUuid}'
+            ],
             'put' => 'clients/{client_uuid}?token={token}',
-            'delete' => 'clients/{client_uuid}?token={token}'
+            'delete' => [
+                'deleteClient' => 'clients/{client_uuid}?token={token}',
+                'deletePhone' => 'client-phones/{phoneNumberUuid}?token={token}',
+                ],
         ],
         'shipments' => [
             'post' => 'shipments?token={token}',

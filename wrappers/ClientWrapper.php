@@ -34,4 +34,53 @@ class ClientWrapper extends UkrposhtaApiWrapper
 
         return new Client($client_array);
     }
+
+    /**
+     * @param int $clientId
+     * @return Client
+     */
+    public function getById($clientId)
+    {
+        $client_array = $this->api->method('GET')->action('getById')->clients($clientId);
+        return new Client($client_array);
+    }
+
+    /**
+     * @param int $clientExternalId
+     * @return Client
+     */
+    public function getByExternalId($clientExternalId)
+    {
+        $client_array = $this->api->method('GET')->action('getByExternalId')->clients($clientExternalId);
+        return new Client($client_array);
+    }
+
+    /**
+     * @param int $clientUuid
+     * @return array $phones
+     */
+    public function getAllPhones($clientUuid)
+    {
+        return $this->api->method('GET')->action('getAllPhones')->clients($clientUuid);
+    }
+
+    /**
+     * @param string $clientUuid
+     * @param string $phoneNumber
+     * @return Client $clientWithAddedPhones
+     */
+    public function addPhone($clientUuid, $phoneNumber)
+    {
+        $client_array = $this->api->method('PUT')->params(['phoneNumber' => $phoneNumber])->clients($clientUuid);
+        return new Client($client_array);
+    }
+
+    /**
+     * @param string $phoneUuid
+     * @return void
+     */
+    public function deletePhone($phoneUuid)
+    {
+        $this->api->method('DELETE')->action('deletePhone')->clients($phoneUuid);
+    }
 }

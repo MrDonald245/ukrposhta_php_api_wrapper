@@ -78,10 +78,25 @@ class UkrposhtaApiTest extends PHPUnit_Framework_TestCase
      */
     public function testGetClient($client)
     {
-        $client = $this->api->method('GET')->clients($client['uuid']);
+        $client = $this->api->method('GET')->action('getById')->clients($client['uuid']);
         $this->checkRequestArrayKeys($client, UkrPoshtaTestExpectedKeys::CLIENT_VALID_KEYS);
 
         return $client;
+    }
+
+    /**
+     * @depends testCreateClient
+     * @param array $client
+     */
+    public function testGetAllClientsPhones($client)
+    {
+        $phones = $this->api->method('GET')->action('getAllPhones')->clients($client['uuid'])[0];
+
+        $this->assertArrayHasKey('uuid', $phones);
+        $this->assertArrayHasKey('phoneNumber', $phones);
+        $this->assertArrayHasKey('type', $phones);
+        $this->assertArrayHasKey('main', $phones);
+
     }
 
     /**
@@ -92,7 +107,44 @@ class UkrposhtaApiTest extends PHPUnit_Framework_TestCase
      */
     public function testDeleteClient($client)
     {
-        $this->api->method('DELETE')->clients($client['uuid']); // TODO: this method does not work
+        // TODO: this method does not work
+        $this->api->method('DELETE')->action('deleteClient')->clients($client['uuid']);
+    }
+
+    /**
+     * @depends testCreateClient
+     * @param array $client
+     * @return array $client
+     */
+    public function testAddPhone($client)
+    {
+        $client_result = $this->api->method('PUT')
+            ->params(['phoneNumber' => '+3809999999'])
+            ->clients($client['uuid']);
+
+        return $client_result;
+    }
+
+    /**
+     * @depends testAddPhone
+     * @param array $client
+     */
+    public function testDeleteClientsPhone($client)
+    {
+        $phone_uuid = '';
+        $old_phones_size = sizeof($client['phones']);
+        foreach ($client['phones'] as $phone) {
+            if ($phone['main'] == false) {
+                $phone_uuid = $phone['uuid'];
+            }
+        }
+
+        $this->api->method('DELETE')->action('deletePhone')->clients($phone_uuid);
+
+        $new_phones_size = sizeof($this->api->method('GET')
+            ->action('getAllPhones')->clients($client['uuid']));
+
+        $this->assertEquals(false, $new_phones_size == $old_phones_size);
     }
 
     /**
@@ -100,11 +152,16 @@ class UkrposhtaApiTest extends PHPUnit_Framework_TestCase
      *
      * @depends testGetClient
      * @param $client
+     * @return array $client
      */
     public function testChangeClient($client)
     {
-        $client = $this->api->method('PUT')->params(['firstName' => 'Ибрагим'])->clients($client['uuid']);
-        $this->assertEquals('Ибрагим', $client['firstName']);
+        $client = $this->api->method('PUT')
+            ->params(['firstName' => 'Златан'])
+            ->clients($client['uuid']);
+        $this->assertEquals('Златан', $client['firstName']);
+
+        return $client;
     }
 
     /**
