@@ -109,7 +109,7 @@ class ClientWrapperTest extends PHPUnit_Framework_TestCase
      * @depends testCreateClientWithEntity
      * @param Client $client
      */
-    public function testGetAllClientsPhones($client)
+    public function testGetAllPhones($client)
     {
         $array_phones = $this->wrapper->client()->getAllPhones($client->getUuid())[0];
 
@@ -117,6 +117,20 @@ class ClientWrapperTest extends PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('phoneNumber', $array_phones);
         $this->assertArrayHasKey('type', $array_phones);
         $this->assertArrayHasKey('main', $array_phones);
+    }
+
+    /**
+     * @depends testCreateClientWithEntity
+     * @param Client $client
+     */
+    public function testGetAllAddresses($client)
+    {
+        $array_addresses = $this->wrapper->client()->getAllAddresses($client->getUuid())[0];
+
+        $this->assertArrayHasKey('uuid', $array_addresses);
+        $this->assertArrayHasKey('addressId', $array_addresses);
+        $this->assertArrayHasKey('type', $array_addresses);
+        $this->assertArrayHasKey('main', $array_addresses);
     }
 
     /**
@@ -137,6 +151,23 @@ class ClientWrapperTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * @depends testCreateClientWithEntity
+     * @param Client $client
+     * @return Client $client_with_new_phones
+     */
+    public function testAddAddress($client)
+    {
+        $address = $this->wrapper->address()->create(new Address(['postcode' => '07401']));
+        $client_with_new_address = $this->wrapper->client()->addAddress($client->getUuid(), $address->getId());
+
+        $amount_of_address = sizeof($client_with_new_address->getAddresses());
+
+        $this->assertEquals(2, $amount_of_address);
+
+        return $client_with_new_address;
+    }
+
+    /**
      * @depends testAddPhone
      * @param Client $client
      */
@@ -154,5 +185,30 @@ class ClientWrapperTest extends PHPUnit_Framework_TestCase
 
         $phone_amount_after_deleting = $this->wrapper->client()->getAllPhones($client->getUuid());
         $this->assertEquals(false, $phone_amount_after_deleting == $phone_amount_before_deleting);
+    }
+
+    /**
+     * @depends testCreateClientWithEntity
+     * @param Client $client
+     */
+    public function testDeleteAddress($client)
+    {
+        $address = $this->wrapper->address()->create(new Address(['postcode'=>'07401']));
+        $client_with_new_address = $this->wrapper->client()->addAddress($client->getUuid(), $address->getId());
+
+        $address_uuid_to_delete = '';
+        foreach ($client_with_new_address->getAddresses() as $address) {
+            if (!$address['main']) {
+                $address_uuid_to_delete = $address['uuid'];
+            }
+        }
+
+        $address_count_before_delete = sizeof($client_with_new_address->getAddresses());
+        $this->wrapper->client()->deleteAddress($address_uuid_to_delete);
+
+        $addresses_after_delete = $this->wrapper->client()->getAllAddresses($client->getUuid());
+        $address_count_after_delete = sizeof($addresses_after_delete);
+
+        $this->assertEquals(false, $address_count_before_delete == $address_count_after_delete);
     }
 }

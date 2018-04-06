@@ -83,4 +83,33 @@ class ClientWrapper extends UkrposhtaApiWrapper
     {
         $this->api->method('DELETE')->action('deletePhone')->clients($phoneUuid);
     }
+
+    /**
+     * @param string $clientUuid
+     * @param int $addressId
+     * @return Client
+     */
+    public function addAddress($clientUuid, $addressId)
+    {
+        $client_array = $this->api->method('PUT')->params(['addressId' => $addressId])->clients($clientUuid);
+        return new Client($client_array);
+    }
+
+    /**
+     * @param int $clientUuid
+     * @return array $phones
+     */
+    public function getAllAddresses($clientUuid)
+    {
+        return $this->api->method('GET')->action('getAllAddresses')->clients($clientUuid);
+    }
+
+    /**
+     * @param string $addressUuid
+     * @return void
+     */
+    public function deleteAddress($addressUuid)
+    {
+        $this->api->method('DELETE')->action('deleteAddress')->clients($addressUuid);
+    }
 }

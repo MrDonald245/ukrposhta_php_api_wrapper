@@ -43,12 +43,14 @@ class UkrposhtaApi
             'get' => [
                 'getById' => 'clients/{client_uuid}?token={token}',
                 'getByExternalId' => 'clients/external-id/{externalId}?token={token}',
-                'getAllPhones' => 'client-phones?token={token}&clientUuid={clientUuid}'
+                'getAllPhones' => 'client-phones?token={token}&clientUuid={clientUuid}',
+                'getAllAddresses' => 'client-addresses?token={token}&clientUuid={clientUuid}',
             ],
             'put' => 'clients/{client_uuid}?token={token}',
             'delete' => [
                 'deleteClient' => 'clients/{client_uuid}?token={token}',
                 'deletePhone' => 'client-phones/{phoneNumberUuid}?token={token}',
+                'deleteAddress' => 'client-addresses/{addressUuid}?token={token}',
                 ],
         ],
         'shipments' => [

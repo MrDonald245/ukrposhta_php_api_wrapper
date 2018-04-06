@@ -100,6 +100,21 @@ class UkrposhtaApiTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * @depends testCreateClient
+     * @param array $client
+     */
+    public function testGetAllClientsAddress($client)
+    {
+        $addresses = $this->api->method('GET')->action('getAllAddresses')->clients($client['uuid'])[0];
+
+        $this->assertArrayHasKey('uuid', $addresses);
+        $this->assertArrayHasKey('addressId', $addresses);
+        $this->assertArrayHasKey('type', $addresses);
+        $this->assertArrayHasKey('main', $addresses);
+    }
+
+
+    /**
      * Delete client
      *
      * @depends testGetClient
@@ -109,6 +124,24 @@ class UkrposhtaApiTest extends PHPUnit_Framework_TestCase
     {
         // TODO: this method does not work
         $this->api->method('DELETE')->action('deleteClient')->clients($client['uuid']);
+    }
+
+    /**
+     * @depends testCreateClient
+     * @param array $client
+     * @return array $client
+     */
+    public function testAddAddress($client)
+    {
+        $new_address = $this->createAddressesWithApi($this->api);
+        $client_result = $this->api->method('PUT')
+            ->params(['addressId' => $new_address['id']])
+            ->clients($client['uuid']);
+
+        $address_count = sizeof($client_result['addresses']);
+        $this->assertEquals(2, $address_count);
+
+        return $client_result;
     }
 
     /**
@@ -145,6 +178,28 @@ class UkrposhtaApiTest extends PHPUnit_Framework_TestCase
             ->action('getAllPhones')->clients($client['uuid']));
 
         $this->assertEquals(false, $new_phones_size == $old_phones_size);
+    }
+
+    /**
+     * @depends testAddAddress
+     * @param array $client
+     */
+    public function testDeleteClientsAddress($client)
+    {
+        $address_id = '';
+        $old_addresses_size = sizeof($client['addresses']);
+        foreach ($client['addresses'] as $address) {
+            if ($address['main'] == false) {
+                $address_uuid = $address['uuid'];
+            }
+        }
+
+        $this->api->method('DELETE')->action('deleteAddress')->clients($address_uuid);
+
+        $new_addresses_size = sizeof($this->api->method('GET')
+            ->action('getAllAddresses')->clients($client['uuid']));
+
+        $this->assertEquals(false, $new_addresses_size == $old_addresses_size);
     }
 
     /**
