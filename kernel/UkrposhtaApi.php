@@ -42,16 +42,18 @@ class UkrposhtaApi
             'post' => 'clients?token={token}',
             'get' => [
                 'getById' => 'clients/{client_uuid}?token={token}',
+                'getByPhone' => 'clients/phone?token={token}&countryISO3166=UA&phoneNumber={phoneNumber}',
                 'getByExternalId' => 'clients/external-id/{externalId}?token={token}',
                 'getAllPhones' => 'client-phones?token={token}&clientUuid={clientUuid}',
                 'getAllAddresses' => 'client-addresses?token={token}&clientUuid={clientUuid}',
+                'getAllEmails' => 'client-emails?token={token}&clientUuid={clientUuid}',
             ],
             'put' => 'clients/{client_uuid}?token={token}',
             'delete' => [
                 'deleteClient' => 'clients/{client_uuid}?token={token}',
                 'deletePhone' => 'client-phones/{phoneNumberUuid}?token={token}',
                 'deleteAddress' => 'client-addresses/{addressUuid}?token={token}',
-                ],
+            ],
         ],
         'shipments' => [
             'post' => 'shipments?token={token}',
@@ -298,17 +300,22 @@ class UkrposhtaApi
                 throw new UkrposhtaApiException('Unexpected error has occurred, may be api token is incorrect');
             }
 
-            $this->isJson($result)
-                ? $api_error = json_decode($result, true)
-                : $api_error = $this->xmlErr2Array($result);
+            if ($this->isHTML($result)) {
+                $api_error['code'] = 500;
+                $api_error['message'] = 'Ukrposhta API returned HTML with error 500. Probably Ukroposhta is down';
+            } else if ($this->isJson($result)) {
+                $api_error = json_decode($result, true);
+            } else {
+                $api_error = $this->xmlErr2Array($result);
+            }
 
-            isset($api_error['message'])
-                ? $error_message = $api_error['message']
-                : $error_message = 'UkrPoshtaApi unexpected error has occurred';
+            $error_message = isset($api_error['message'])
+                ? $api_error['message']
+                : 'UkrPoshtaApi unexpected error has occurred';
 
-            isset($api_error['code'])
-                ? $error_code = $this->extractNumberFromStr($api_error['code'])
-                : $error_code = null;
+            $error_code = isset($api_error['code'])
+                ? $this->extractNumberFromStr($api_error['code'])
+                : null;
 
             throw new UkrposhtaApiException($error_message, $error_code);
         }
@@ -401,10 +408,19 @@ class UkrposhtaApi
      * @param string $string
      * @return bool
      */
-    function isJson($string)
+    private function isJson($string)
     {
         json_decode($string);
         return (json_last_error() == JSON_ERROR_NONE);
+    }
+
+    /**
+     * @param string $string
+     * @return bool
+     */
+    private function isHTML($string)
+    {
+        return preg_match('/html/i', $string);
     }
 
     /**

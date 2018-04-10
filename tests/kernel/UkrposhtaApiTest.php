@@ -88,6 +88,16 @@ class UkrposhtaApiTest extends PHPUnit_Framework_TestCase
      * @depends testCreateClient
      * @param array $client
      */
+    public function testGetClientByPhone($client)
+    {
+        $client = $this->api->method('GET')->action('getByPhone')->clients($client['phoneNumber'])[0];
+        $this->checkRequestArrayKeys($client, UkrPoshtaTestExpectedKeys::CLIENT_VALID_KEYS);
+    }
+
+    /**
+     * @depends testCreateClient
+     * @param array $client
+     */
     public function testGetAllClientsPhones($client)
     {
         $phones = $this->api->method('GET')->action('getAllPhones')->clients($client['uuid'])[0];
@@ -113,6 +123,18 @@ class UkrposhtaApiTest extends PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('main', $addresses);
     }
 
+    /**
+     * @depends testCreateClient
+     * @param array $client
+     */
+    public function testGetAllClientsEmails($client)
+    {
+        $emails = $this->api->method('GET')->action('getAllEmails')->clients($client['uuid'])[0];
+
+        $this->assertArrayHasKey('uuid', $emails);
+        $this->assertArrayHasKey('email', $emails);
+        $this->assertArrayHasKey('main', $emails);
+    }
 
     /**
      * Delete client
@@ -424,7 +446,7 @@ class UkrposhtaApiTest extends PHPUnit_Framework_TestCase
             'individual' => true,
             'uniqueRegistrationNumber' => '0035',
             'addressId' => $address['id'],
-            'phoneNumber' => '067 123 12 34',
+            'phoneNumber' => '039052406',
             'resident' => true,
             'email' => 'test@test.com',
         ])->clients();

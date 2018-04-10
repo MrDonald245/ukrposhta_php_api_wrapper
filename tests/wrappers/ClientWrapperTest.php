@@ -73,7 +73,7 @@ class ClientWrapperTest extends PHPUnit_Framework_TestCase
             'name' => 'ТОВ Експресс Банк',
             'uniqueRegistrationNumber' => '0035',
             'addressId' => $address->getId(),
-            'phoneNumber' => '067 123 12 34',
+            'phoneNumber' => '032 037 00 68',
             'resident' => true,
             'edrpou' => '20053145',
             'email' => 'test@test.com',]);
@@ -109,6 +109,17 @@ class ClientWrapperTest extends PHPUnit_Framework_TestCase
      * @depends testCreateClientWithEntity
      * @param Client $client
      */
+    public function testGetClientByPhone($client)
+    {
+        $phone = $client->getPhoneNumber();
+        $result_client = $this->wrapper->client()->getByPhone($phone);
+        $this->assertEquals($phone, $result_client->getPhoneNumber());
+    }
+
+    /**
+     * @depends testCreateClientWithEntity
+     * @param Client $client
+     */
     public function testGetAllPhones($client)
     {
         $array_phones = $this->wrapper->client()->getAllPhones($client->getUuid())[0];
@@ -131,6 +142,19 @@ class ClientWrapperTest extends PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('addressId', $array_addresses);
         $this->assertArrayHasKey('type', $array_addresses);
         $this->assertArrayHasKey('main', $array_addresses);
+    }
+
+    /**
+     * @depends testCreateClientWithEntity
+     * @param Client $client
+     */
+    public function testGetAllEmails($client)
+    {
+        $array_emails = $this->wrapper->client()->getAllEmails($client->getUuid())[0];
+
+        $this->assertArrayHasKey('uuid', $array_emails);
+        $this->assertArrayHasKey('email', $array_emails);
+        $this->assertArrayHasKey('main', $array_emails);
     }
 
     /**
@@ -174,7 +198,7 @@ class ClientWrapperTest extends PHPUnit_Framework_TestCase
     public function testDeletePhone($client)
     {
         $phone_amount_before_deleting = sizeof($client->getPhones());
-
+        $new_phone_uuid = '';
         foreach ($client->getPhones() as $phone) {
             if ($phone['main'] == false) {
                 $new_phone_uuid = $phone['uuid'];
@@ -193,7 +217,7 @@ class ClientWrapperTest extends PHPUnit_Framework_TestCase
      */
     public function testDeleteAddress($client)
     {
-        $address = $this->wrapper->address()->create(new Address(['postcode'=>'07401']));
+        $address = $this->wrapper->address()->create(new Address(['postcode' => '07401']));
         $client_with_new_address = $this->wrapper->client()->addAddress($client->getUuid(), $address->getId());
 
         $address_uuid_to_delete = '';

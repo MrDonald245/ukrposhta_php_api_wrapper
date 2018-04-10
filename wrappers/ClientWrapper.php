@@ -56,12 +56,35 @@ class ClientWrapper extends UkrposhtaApiWrapper
     }
 
     /**
+     * @param string $clientPhoneNumber
+     * @return Client
+     */
+    public function getByPhone($clientPhoneNumber)
+    {
+        $client_array = end($this->api
+            ->method('GET')
+            ->action('getByPhone')
+            ->clients($clientPhoneNumber));
+
+        return new Client($client_array);
+    }
+
+    /**
      * @param int $clientUuid
      * @return array $phones
      */
     public function getAllPhones($clientUuid)
     {
         return $this->api->method('GET')->action('getAllPhones')->clients($clientUuid);
+    }
+
+    /**
+     * @param int $clientUuid
+     * @return array $emails
+     */
+    public function getAllEmails($clientUuid)
+    {
+        return $this->api->method('GET')->action('getAllEmails')->clients($clientUuid);
     }
 
     /**
