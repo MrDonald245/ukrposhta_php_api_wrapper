@@ -196,7 +196,7 @@ class UkrposhtaApiTest extends PHPUnit_Framework_TestCase
      */
     public function testDeleteClientsAddress($client)
     {
-        $address_id = '';
+        $address_uuid = '';
         $old_addresses_size = sizeof($client['addresses']);
         foreach ($client['addresses'] as $address) {
             if ($address['main'] == false) {

@@ -57,6 +57,13 @@ class UkrposhtaApiWrapper
         return new ShipmentWrapper($this->api->getBearer(), $this->api->getToken());
     }
 
+    /**
+     * @return ShipmentGroupWrapper
+     */
+    public function shipmentGroup()
+    {
+        return new ShipmentGroupWrapper($this->api->getBearer(), $this->api->getToken());
+    }
 
     /**
      * @param EntityBase $entity
