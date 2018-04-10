@@ -41,6 +41,40 @@ class ShipmentWrapperTest extends PHPUnit_Framework_TestCase
         ]);
 
         $created_shipment = $this->wrapper->shipment()->create($shipment);
+        $this->assertEquals(true, $created_shipment->getUuid() != null);
+
+        return $created_shipment;
+    }
+
+    /**
+     * @depends testCreate
+     * @param Shipment $shipment
+     */
+    public function testEdit($shipment)
+    {
+        $edited_shipment = $this->wrapper->shipment()->edit($shipment->getUuid(), ['description' => 'new description']);
+        $this->assertEquals('new description', $edited_shipment->getDescription());
+    }
+
+    /**
+     * @depends testCreate
+     * @param Shipment $shipment
+     */
+    public function testGetByUuid($shipment)
+    {
+        $fetched_shipment = $this->wrapper->shipment()->getByUuid($shipment->getUuid());
+        $this->assertEquals($shipment->getUuid(), $fetched_shipment->getUuid());
+    }
+
+    /**
+     * @depends testCreate
+     * @param Shipment $shipment
+     */
+    public function testDelete($shipment)
+    {
+        $this->wrapper->shipment()->delete($shipment->getUuid());
+        $this->expectException(UkrposhtaApiException::class);
+        $this->wrapper->shipment()->getByUuid($shipment->getUuid());
     }
 
     /**

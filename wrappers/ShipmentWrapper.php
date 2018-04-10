@@ -34,4 +34,30 @@ class ShipmentWrapper extends UkrposhtaApiWrapper
         $shipment_array = $this->api->method('POST')->params($data)->shipments();
         return new Shipment($shipment_array);
     }
+
+    /**
+     * @param string $shipmentUuid
+     * @param array $params
+     * @return Shipment
+     */
+    public function edit($shipmentUuid, $params)
+    {
+        $shipment_array = $this->api->method('PUT')->params($params)->shipments($shipmentUuid);
+        return new Shipment($shipment_array);
+    }
+
+    public function getByUuid($shipmentUuid)
+    {
+        $shipment_array = $this->api->method('GET')->shipments($shipmentUuid);
+        return new Shipment($shipment_array);
+    }
+
+    /**
+     * @param int $shipmentUuid
+     * @return void
+     */
+    public function delete($shipmentUuid)
+    {
+        $this->api->method('DELETE')->shipments($shipmentUuid);
+    }
 }

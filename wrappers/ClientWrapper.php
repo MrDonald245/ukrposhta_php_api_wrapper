@@ -36,6 +36,17 @@ class ClientWrapper extends UkrposhtaApiWrapper
     }
 
     /**
+     * @param string $clientUuid
+     * @param array $params
+     * @return Client
+     */
+    public function edit($clientUuid, $params)
+    {
+        $client_array = $this->api->method('PUT')->params($params)->clients($clientUuid);
+        return new Client($client_array);
+    }
+
+    /**
      * @param int $clientId
      * @return Client
      */

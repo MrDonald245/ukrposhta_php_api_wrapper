@@ -88,6 +88,16 @@ class ClientWrapperTest extends PHPUnit_Framework_TestCase
      * @depends testCreateClientWithEntity
      * @param Client $client
      */
+    public function testEditClient($client)
+    {
+        $edited_client = $this->wrapper->client()->edit($client->getUuid(), ['name' => 'new name']);
+        $this->assertEquals('new name', $edited_client->getName());
+    }
+    
+    /**
+     * @depends testCreateClientWithEntity
+     * @param Client $client
+     */
     public function testGetClientById($client)
     {
         $client = $this->wrapper->client()->getById($client->getUuid());
