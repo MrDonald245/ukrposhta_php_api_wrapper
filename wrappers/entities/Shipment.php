@@ -44,14 +44,14 @@ class Shipment extends EntityBase
      * Якщо відправник юридична особа або фізична особа
      * підприємець то поля tin або edrpou повинні бути заповнені
      *
-     * @var string $sender
+     * @var array $sender
      */
     private $sender;
 
     /**
      * Інформацію про одержувача можна вказати передавши uuid одержувача
      *
-     * @var string $recipient
+     * @var array $recipient
      */
     private $recipient;
 
@@ -87,7 +87,7 @@ class Shipment extends EntityBase
     private $returnAddressId;
 
     /**
-     *Ідентифікатор групи відправлень, якщо відправлення групове
+     * Ідентифікатор групи відправлень, якщо відправлення групове
      *
      * @var string $shipmentGroupUuid
      */
@@ -429,7 +429,6 @@ class Shipment extends EntityBase
     private $direction;
 
 
-
     /**
      * EntityBase constructor.
      *
@@ -468,7 +467,7 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @return string
+     * @return string Ідентифікатор створеного відправлення
      */
     public function getUuid()
     {
@@ -476,7 +475,7 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @param string $uuid
+     * @param string $uuid Ідентифікатор створеного відправлення
      * @return Shipment
      */
     public function setUuid($uuid)
@@ -486,7 +485,9 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @return string
+     * @return string Тип відправлення
+     * EXPRESS - Укрпошта експрес.
+     * STANDARD - Укрпошта стандарт. По замовченню EXPRESS
      */
     public function getType()
     {
@@ -494,7 +495,10 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @param string $type
+     * @param string $type Тип відправлення
+     * EXPRESS - Укрпошта експрес.
+     * STANDARD - Укрпошта стандарт. По замовченню EXPRESS
+     *
      * @return Shipment
      */
     public function setType($type)
@@ -504,7 +508,10 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @return string
+     * @return array Інформацію про відправника можна вказати передавши uuid
+     * відправника (дивись приклад мінімального запиту)
+     * Якщо відправник юридична особа або фізична особа
+     * підприємець то поля tin або edrpou повинні бути заповнені
      */
     public function getSender()
     {
@@ -512,7 +519,11 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @param string $sender
+     * @param string $sender Інформацію про відправника можна вказати передавши uuid
+     * відправника (дивись приклад мінімального запиту)
+     * Якщо відправник юридична особа або фізична особа
+     * підприємець то поля tin або edrpou повинні бути заповнені
+     *
      * @return Shipment
      */
     public function setSender($sender)
@@ -522,7 +533,7 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @return string
+     * @return array Інформацію про одержувача можна вказати передавши uuid одержувача
      */
     public function getRecipient()
     {
@@ -530,7 +541,8 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @param string $recipient
+     * @param string $recipient Інформацію про одержувача можна вказати передавши uuid одержувача
+     *
      * @return Shipment
      */
     public function setRecipient($recipient)
@@ -540,7 +552,8 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @return string
+     * @return string Додатковий телефонний номер одержувача, якщо вказаний,
+     * номер стає основним і відображається в документах
      */
     public function getRecipientPhone()
     {
@@ -548,7 +561,9 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @param string $recipientPhone
+     * @param string $recipientPhone Додатковий телефонний номер одержувача, якщо вказаний,
+     * номер стає основним і відображається в документах
+     *
      * @return Shipment
      */
     public function setRecipientPhone($recipientPhone)
@@ -558,7 +573,7 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @return string
+     * @return string Додаткова електронна пошта
      */
     public function getRecipientEmail()
     {
@@ -566,7 +581,8 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @param string $recipientEmail
+     * @param string $recipientEmail Додаткова електронна пошта
+     *
      * @return Shipment
      */
     public function setRecipientEmail($recipientEmail)
@@ -576,7 +592,7 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @return string
+     * @return string Id адреса отримувача, можна вказати тільки ту адресу, яка заповнена в тілі клієнта
      */
     public function getRecipientAddressId()
     {
@@ -585,6 +601,8 @@ class Shipment extends EntityBase
 
     /**
      * @param string $recipientAddressId
+     * Id адреса отримувача, можна вказати тільки ту адресу, яка заповнена в тілі клієнта
+     *
      * @return Shipment
      */
     public function setRecipientAddressId($recipientAddressId)
@@ -594,7 +612,9 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @return string
+     * @return string Адреса повернення, може бути вказана додатково,
+     * якщо не вказана returnAddressId буде використана основна адреса у якої main-true.
+     * returnAddressId повинен бути одним з addressId відправника.
      */
     public function getReturnAddressId()
     {
@@ -602,7 +622,10 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @param string $returnAddressId
+     * @param string $returnAddressId Адреса повернення, може бути вказана додатково,
+     * якщо не вказана returnAddressId буде використана основна адреса у якої main-true.
+     * returnAddressId повинен бути одним з addressId відправника.
+     *
      * @return Shipment
      */
     public function setReturnAddressId($returnAddressId)
@@ -612,7 +635,7 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @return string
+     * @return string Ідентифікатор групи відправлень, якщо відправлення групове
      */
     public function getShipmentGroupUuid()
     {
@@ -620,7 +643,8 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @param string $shipmentGroupUuid
+     * @param string $shipmentGroupUuid Ідентифікатор групи відправлень, якщо відправлення групове
+     *
      * @return Shipment
      */
     public function setShipmentGroupUuid($shipmentGroupUuid)
@@ -630,7 +654,7 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @return string
+     * @return string Зовнішній ідентифікатор відправлення в базі контрагента
      */
     public function getExternalId()
     {
@@ -638,7 +662,8 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @param string $externalId
+     * @param string $externalId Зовнішній ідентифікатор відправлення в базі контрагента
+     *
      * @return Shipment
      */
     public function setExternalId($externalId)
@@ -648,7 +673,9 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @return string
+     * @return string Тип доставки (4 основних типи:
+     * W2D склад-двері, W2W склад-склад , D2W двері-склад, D2D двері- двері)
+     * (Для Укрпошта STANDART(type:STANDA RT) тільки з оголошеною цінністю)
      */
     public function getDeliveryType()
     {
@@ -656,7 +683,10 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @param string $deliveryType
+     * @param string $deliveryType Тип доставки (4 основних типи:
+     * W2D склад-двері, W2W склад-склад , D2W двері-склад, D2D двері- двері)
+     * (Для Укрпошта STANDART(type:STANDA RT) тільки з оголошеною цінністю)
+     *
      * @return Shipment
      */
     public function setDeliveryType($deliveryType)
@@ -666,7 +696,7 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @return string
+     * @return string Тип посилки (для міжнародних відправлень)
      */
     public function getPackageType()
     {
@@ -674,7 +704,8 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @param string $packageType
+     * @param string $packageType Тип посилки (для міжнародних відправлень)
+     *
      * @return Shipment
      */
     public function setPackageType($packageType)
@@ -684,7 +715,11 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @return string
+     * @return string Дії с відправленням в разі якщо одержувач не забрав його.
+     * Якщо не вказано, RETURN по замовченню.
+     * • RETURN - повернути відправнику.
+     * • RETURN_AFTER_FREE_STORAGE - повернути після закінчення строку безкоштовного зберігання.
+     * • PROCESS_AS_REFUSAL - знищити посилку.
      */
     public function getOnFailReceiveType()
     {
@@ -692,7 +727,12 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @param string $onFailReceiveType
+     * @param string $onFailReceiveType Дії с відправленням в разі якщо одержувач не забрав його.
+     * Якщо не вказано, RETURN по замовченню.
+     * • RETURN - повернути відправнику.
+     * • RETURN_AFTER_FREE_STORAGE - повернути після закінчення строку безкоштовного зберігання.
+     * • PROCESS_AS_REFUSAL - знищити посилку.
+     *
      * @return Shipment
      */
     public function setOnFailReceiveType($onFailReceiveType)
@@ -702,7 +742,7 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @return string
+     * @return string Штрих-код посилки
      */
     public function getBarcode()
     {
@@ -710,7 +750,8 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @param string $barcode
+     * @param string $barcode Штрих-код посилки
+     *
      * @return Shipment
      */
     public function setBarcode($barcode)
@@ -720,7 +761,7 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @return int
+     * @return int Вага відправлення заповнюється з ваги вказаної в parcels
      */
     public function getWeight()
     {
@@ -728,7 +769,8 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @param int $weight
+     * @param int $weight Вага відправлення заповнюється з ваги вказаної в parcels
+     *
      * @return Shipment
      */
     public function setWeight($weight)
@@ -738,7 +780,12 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @return int
+     * @return int Найбільша сторона відправлення заповнюється як найбільше значення з довжини,
+     * ширини або висоти вказаних в parcels.
+     * Якщо length більше 50 см відправлення помічається як «громіздке».
+     * Найбільша сторона не повинна перевищувати 2м,
+     * сума довжини і найбільшого периметра у будь-якому напрямку (крім довжини) не повинна перевищувати 3,5 м.
+     * Розраховується наступним чином: довжина + (2*(ширина + висота))
      */
     public function getLength()
     {
@@ -746,7 +793,13 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @param int $length
+     * @param int $length Найбільша сторона відправлення заповнюється як найбільше значення з довжини,
+     * ширини або висоти вказаних в parcels.
+     * Якщо length більше 50 см відправлення помічається як «громіздке».
+     * Найбільша сторона не повинна перевищувати 2м,
+     * сума довжини і найбільшого периметра у будь-якому напрямку (крім довжини) не повинна перевищувати 3,5 м.
+     * Розраховується наступним чином: довжина + (2*(ширина + висота))
+     *
      * @return Shipment
      */
     public function setLength($length)
@@ -756,7 +809,7 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @return int
+     * @return int Ширина відправлення (тільки цифри). Вказується ширина в сантиметрах.
      */
     public function getWidth()
     {
@@ -764,7 +817,8 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @param int $width
+     * @param int $width Ширина відправлення (тільки цифри). Вказується ширина в сантиметрах.
+     *
      * @return Shipment
      */
     public function setWidth($width)
@@ -774,7 +828,7 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @return int
+     * @return int Висота відправлення (тільки цифри). Вказується висота в сантиметрах.
      */
     public function getHeight()
     {
@@ -782,7 +836,8 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @param int $height
+     * @param int $height Висота відправлення (тільки цифри). Вказується висота в сантиметрах.
+     *
      * @return Shipment
      */
     public function setHeight($height)
@@ -792,7 +847,7 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @return int
+     * @return int Заявлена ціна відправлення
      */
     public function getDeclaredPrice()
     {
@@ -800,7 +855,8 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @param int $declaredPrice
+     * @param int $declaredPrice Заявлена ціна відправлення
+     *
      * @return Shipment
      */
     public function setDeclaredPrice($declaredPrice)
@@ -810,7 +866,7 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @return int
+     * @return int Розрахована ціна доставки в гривнях, формується на основі тарифів ПАТ «Укрпошта»
      */
     public function getDeliveryPrice()
     {
@@ -818,7 +874,8 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @param int $deliveryPrice
+     * @param int $deliveryPrice Розрахована ціна доставки в гривнях, формується на основі тарифів ПАТ «Укрпошта»
+     *
      * @return Shipment
      */
     public function setDeliveryPrice($deliveryPrice)
@@ -828,7 +885,7 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @return int
+     * @return int Післяплата в гривнях, не може бути більшою ніж заявлена ціна
      */
     public function getPostPay()
     {
@@ -836,7 +893,8 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @param int $postPay
+     * @param int $postPay Післяплата в гривнях, не може бути більшою ніж заявлена ціна
+     *
      * @return Shipment
      */
     public function setPostPay($postPay)
@@ -846,7 +904,7 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @return string
+     * @return string Код валюти (для міжнародних відправлень)
      */
     public function getCurrencyCode()
     {
@@ -854,7 +912,8 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @param string $currencyCode
+     * @param string $currencyCode Код валюти (для міжнародних відправлень)
+     *
      * @return Shipment
      */
     public function setCurrencyCode($currencyCode)
@@ -864,7 +923,7 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @return float
+     * @return float Курс валюти для післяплати (для міжнародних відправлень)
      */
     public function getPostPayCurrencyCode()
     {
@@ -872,7 +931,8 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @param float $postPayCurrencyCode
+     * @param float $postPayCurrencyCode Курс валюти для післяплати (для міжнародних відправлень)
+     *
      * @return Shipment
      */
     public function setPostPayCurrencyCode($postPayCurrencyCode)
@@ -882,7 +942,7 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @return float
+     * @return float Курс валют (для міжнародних відправлень)
      */
     public function getCurrencyExchangeRate()
     {
@@ -890,7 +950,7 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @param float $currencyExchangeRate
+     * @param float $currencyExchangeRate Курс валют (для міжнародних відправлень)
      * @return Shipment
      */
     public function setCurrencyExchangeRate($currencyExchangeRate)
@@ -900,7 +960,10 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @return string
+     * @return string Клієнтська знижка якщо у клієнта або контрагента є знижка вона автоматично присвоюється відправленню.
+     * Має: uuid- ідентифікатор, name-ім’я, fromDate-дата початку дії знижки, toDate-дата кінця дії знижки,
+     * value- розмір знижки, shipmentType- тип відправлення на яке зазначається знижка,
+     * applicableToDeliveryTypes- тип доставки – на яке призначається знижка.
      */
     public function getDiscount()
     {
@@ -908,7 +971,11 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @param string $discount
+     * @param string $discount Клієнтська знижка якщо у клієнта або контрагента є знижка вона автоматично присвоюється відправленню.
+     * Має: uuid- ідентифікатор, name-ім’я, fromDate-дата початку дії знижки, toDate-дата кінця дії знижки,
+     * value- розмір знижки, shipmentType- тип відправлення на яке зазначається знижка,
+     * applicableToDeliveryTypes- тип доставки – на яке призначається знижка.
+     *
      * @return Shipment
      */
     public function setDiscount($discount)
@@ -918,7 +985,8 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @return DateTime
+     * @return DateTime Дата внесення останніх змін у відправлення.
+     * Дата і час у форматі "2017-06-12T12:31:56"
      */
     public function getLastModified()
     {
@@ -926,7 +994,9 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @param DateTime $lastModified
+     * @param DateTime $lastModified Дата внесення останніх змін у відправлення.
+     * Дата і час у форматі "2017-06-12T12:31:56"
+     *
      * @return Shipment
      */
     public function setLastModified($lastModified)
@@ -936,7 +1006,7 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @return string
+     * @return string Опис чи коментарі (максимальна кількість 255 символів).
      */
     public function getDescription()
     {
@@ -944,7 +1014,8 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @param string $description
+     * @param string $description Опис чи коментарі (максимальна кількість 255 символів).
+     *
      * @return Shipment
      */
     public function setDescription($description)
@@ -954,7 +1025,14 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @return array
+     * @return array Параметри посилки. У відправлення може бути тільки одна посилка.
+     * При створені посилки необхідно вказати основні поля:
+     * weight - максимальна вага відправлення 30000 грам.
+     * Вага відправлення повинна бути більше нуля,
+     * length-довжина найбільшої сторони відправлення (тільки цифри),
+     * вказується довжина в сантиметрах, довжина відправлення повинна бути більше нуля.
+     * declaredPrice - Заявлена ціна відправлення, заповнюється в гривнях.
+     * Параметри посилки використовуються як основні у відправленні
      */
     public function getParcels()
     {
@@ -962,7 +1040,15 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @param array $parcels
+     * @param array $parcels Параметри посилки. У відправлення може бути тільки одна посилка.
+     * При створені посилки необхідно вказати основні поля:
+     * weight - максимальна вага відправлення 30000 грам.
+     * Вага відправлення повинна бути більше нуля,
+     * length-довжина найбільшої сторони відправлення (тільки цифри),
+     * вказується довжина в сантиметрах, довжина відправлення повинна бути більше нуля.
+     * declaredPrice - Заявлена ціна відправлення, заповнюється в гривнях.
+     * Параметри посилки використовуються як основні у відправленні
+     *
      * @return Shipment
      */
     public function setParcels($parcels)
@@ -972,7 +1058,7 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @return array
+     * @return array трекінг відправлення
      */
     public function getStatusTrackings()
     {
@@ -980,7 +1066,8 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @param array $statusTrackings
+     * @param array $statusTrackings трекінг відправлення
+     *
      * @return Shipment
      */
     public function setStatusTrackings($statusTrackings)
@@ -990,7 +1077,9 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @return bool
+     * @return bool Оплата за пересилання відправлення при отриманні.
+     * True – оплата одержувачем false-оплата відправником.
+     * По замовченню false (Для Укрпошта STANDART(type:STANDART) тільки з оголошеною цінністю)
      */
     public function isPaidByRecipient()
     {
@@ -998,7 +1087,10 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @param bool $paidByRecipient
+     * @param bool $paidByRecipient Оплата за пересилання відправлення при отриманні.
+     * True – оплата одержувачем false-оплата відправником.
+     * По замовченню false (Для Укрпошта STANDART(type:STANDART) тільки з оголошеною цінністю)
+     *
      * @return Shipment
      */
     public function setPaidByRecipient($paidByRecipient)
@@ -1008,7 +1100,9 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @return bool
+     * @return bool Оплата безготівковим розрахунком.
+     * True- безготівковий, false – готівковий.
+     * По замовченню true
      */
     public function isNonCashPayment()
     {
@@ -1016,7 +1110,10 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @param bool $nonCashPayment
+     * @param bool $nonCashPayment Оплата безготівковим розрахунком.
+     * True- безготівковий, false – готівковий.
+     * По замовченню true
+     *
      * @return Shipment
      */
     public function setNonCashPayment($nonCashPayment)
@@ -1026,7 +1123,10 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @return bool
+     * @return bool Помітка громіздка посилка.
+     * True-громіздка, false – не громіздка.
+     * По замовченню false.
+     * Якщо найбільша сторона відправлення більше 50 см, то присвоюється значення true.
      */
     public function isBulky()
     {
@@ -1034,7 +1134,11 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @param bool $bulky
+     * @param bool $bulky Помітка громіздка посилка.
+     * True-громіздка, false – не громіздка.
+     * По замовченню false.
+     * Якщо найбільша сторона відправлення більше 50 см, то присвоюється значення true.
+     *
      * @return Shipment
      */
     public function setBulky($bulky)
@@ -1044,7 +1148,9 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @return bool
+     * @return bool Помітка крихка посилка.
+     * True-крихка, false – не крихка.
+     * По замовченню false
      */
     public function isFragile()
     {
@@ -1052,7 +1158,10 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @param bool $fragile
+     * @param bool $fragile Помітка крихка посилка.
+     * True-крихка, false – не крихка.
+     * По замовченню false
+     *
      * @return Shipment
      */
     public function setFragile($fragile)
@@ -1062,7 +1171,7 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @return bool
+     * @return bool Помітка бджоли. По замовченню false
      */
     public function isBees()
     {
@@ -1070,7 +1179,8 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @param bool $bees
+     * @param bool $bees Помітка бджоли. По замовченню false
+     *
      * @return Shipment
      */
     public function setBees($bees)
@@ -1080,7 +1190,9 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @return bool
+     * @return bool Відправлення з повідомлення про отримання.
+     * Якщо true при отриманні відправлення, відправник отримує лист про те що відправлення було отримано.
+     * По замовченню false.
      */
     public function isRecommended()
     {
@@ -1088,7 +1200,10 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @param bool $recommended
+     * @param bool $recommended Відправлення з повідомлення про отримання.
+     * Якщо true при отриманні відправлення, відправник отримує лист про те що відправлення було отримано.
+     * По замовченню false.
+     *
      * @return Shipment
      */
     public function setRecommended($recommended)
@@ -1098,7 +1213,9 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @return bool
+     * @return bool Sms повідомлення про прибуття посилки.
+     * Якщо true одержувач отримає повідомлення.
+     * По замовченню false.
      */
     public function isSms()
     {
@@ -1106,7 +1223,10 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @param bool $sms
+     * @param bool $sms Sms повідомлення про прибуття посилки.
+     * Якщо true одержувач отримає повідомлення.
+     * По замовченню false.
+     *
      * @return Shipment
      */
     public function setSms($sms)
@@ -1116,7 +1236,7 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @return bool
+     * @return bool Міжнародне відправлення по замовченню false.
      */
     public function isInternational()
     {
@@ -1124,7 +1244,8 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @param bool $international
+     * @param bool $international Міжнародне відправлення по замовченню false.
+     *
      * @return Shipment
      */
     public function setInternational($international)
@@ -1134,7 +1255,7 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @return string
+     * @return string Життєвий цикл відправлення містить status, statusDate
      */
     public function getLifecycle()
     {
@@ -1142,7 +1263,8 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @param string $lifecycle
+     * @param string $lifecycle Життєвий цикл відправлення містить status, statusDate
+     *
      * @return Shipment
      */
     public function setLifecycle($lifecycle)
@@ -1152,7 +1274,8 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @return string
+     * @return string Після створення відправлення status змінюється на CREATED,
+     * після реєстрації відправлення у відділенні зв’язку status змінюється на REGISTERED
      */
     public function getStatus()
     {
@@ -1160,7 +1283,9 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @param string $status
+     * @param string $status Після створення відправлення status змінюється на CREATED,
+     * після реєстрації відправлення у відділенні зв’язку status змінюється на REGISTERED
+     *
      * @return Shipment
      */
     public function setStatus($status)
@@ -1170,7 +1295,7 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @return string
+     * @return string Ціна пересилання післяплати
      */
     public function getPostPayDeliveryPrice()
     {
@@ -1178,7 +1303,8 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @param string $postPayDeliveryPrice
+     * @param string $postPayDeliveryPrice Ціна пересилання післяплати
+     *
      * @return Shipment
      */
     public function setPostPayDeliveryPrice($postPayDeliveryPrice)
@@ -1188,7 +1314,10 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @return bool
+     * @return bool Сторона яка сплачує плату Ні за пересилання післяплати,
+     * якщо true то суму сплачує одержувач, якщо false то сплачує відправник.
+     * По замовченню postPayPaidByRecipient: true
+     * (Для Укрпошта STANDART(type:STANDART) тільки з оголошеною цінністю)
      */
     public function isPostPayPaidByRecipient()
     {
@@ -1196,7 +1325,11 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @param bool $postPayPaidByRecipient
+     * @param bool $postPayPaidByRecipient Сторона яка сплачує плату Ні за пересилання післяплати,
+     * якщо true то суму сплачує одержувач, якщо false то сплачує відправник.
+     * По замовченню postPayPaidByRecipient: true
+     * (Для Укрпошта STANDART(type:STANDART) тільки з оголошеною цінністю)
+     *
      * @return Shipment
      */
     public function setPostPayPaidByRecipient($postPayPaidByRecipient)
@@ -1206,7 +1339,7 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @return string
+     * @return string Опис калькуляції який описує на основі чого сформовано параметри вартості поштового відправлення.
      */
     public function getCalculationDescription()
     {
@@ -1214,7 +1347,9 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @param string $calculationDescription
+     * @param string $calculationDescription Опис калькуляції який описує на основі чого сформовано параметри
+     * вартості поштового відправлення.
+     *
      * @return Shipment
      */
     public function setCalculationDescription($calculationDescription)
@@ -1224,7 +1359,9 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @return bool
+     * @return bool Зворотна доставка документації.
+     * По замовченню false.
+     * (Для Укрпошта STANDART(type:STANDART) тільки з оголошеною цінністю)
      */
     public function isDocumentBack()
     {
@@ -1233,6 +1370,10 @@ class Shipment extends EntityBase
 
     /**
      * @param bool $documentBack
+     *  Зворотна доставка документації.
+     * По замовченню false.
+     * (Для Укрпошта STANDART(type:STANDART) тільки з оголошеною цінністю)
+     *
      * @return Shipment
      */
     public function setDocumentBack($documentBack)
@@ -1242,7 +1383,8 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @return bool
+     * @return bool Огляд при вручені. По замовченню false.
+     * (Доступно тільки для EXPRESS)
      */
     public function isCheckOnDelivery()
     {
@@ -1250,7 +1392,9 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @param bool $checkOnDelivery
+     * @param bool $checkOnDelivery Огляд при вручені. По замовченню false.
+     * (Доступно тільки для EXPRESS)
+     *
      * @return Shipment
      */
     public function setCheckOnDelivery($checkOnDelivery)
@@ -1260,7 +1404,9 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @return bool
+     * @return bool Відобразити інформацію щодо банківського рахунку відправника на адресному ярлику.
+     * По замовченню false.
+     * Тільки якщо є післяплата postpay
      */
     public function isTransferPostPayToBankAccount()
     {
@@ -1268,7 +1414,9 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @param bool $transferPostPayToBankAccount
+     * @param bool $transferPostPayToBankAccount Відобразити інформацію щодо банківського рахунку відправника на адресному ярлику.
+     * По замовченню false.
+     * Тільки якщо є післяплата postpay
      * @return Shipment
      */
     public function setTransferPostPayToBankAccount($transferPostPayToBankAccount)
@@ -1278,7 +1426,8 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @return bool
+     * @return bool Плата за пересилання оплачена.
+     * (Заповнюються робітником відділення)
      */
     public function isDeliveryPricePaid()
     {
@@ -1286,7 +1435,9 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @param bool $deliveryPricePaid
+     * @param bool $deliveryPricePaid Плата за пересилання оплачена.
+     * (Заповнюються робітником відділення)
+     *
      * @return Shipment
      */
     public function setDeliveryPricePaid($deliveryPricePaid)
@@ -1296,7 +1447,7 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @return bool
+     * @return bool Післяплата оплачена. (Заповнюються робітником відділення)
      */
     public function isPostPayPaid()
     {
@@ -1304,7 +1455,7 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @param bool $postPayPaid
+     * @param bool $postPayPaid Післяплата оплачена. (Заповнюються робітником відділення)
      * @return Shipment
      */
     public function setPostPayPaid($postPayPaid)
@@ -1314,7 +1465,8 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @return bool
+     * @return bool Плата за пересилання післяплати оплачена.
+     * (Заповнюються робітником відділення)
      */
     public function isPostPayDeliveryPricePaid()
     {
@@ -1322,7 +1474,9 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @param bool $postPayDeliveryPricePaid
+     * @param bool $postPayDeliveryPricePaid Плата за пересилання післяплати оплачена.
+     * (Заповнюються робітником відділення)
+     *
      * @return Shipment
      */
     public function setPostPayDeliveryPricePaid($postPayDeliveryPricePaid)
@@ -1332,7 +1486,9 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @return bool
+     * @return bool упаковка відправлення відправником,
+     * якщо packedBySender true відправник отримує додаткову знижку 2%,
+     * тільки для групових відправлень
      */
     public function isPackedBySender()
     {
@@ -1340,7 +1496,10 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @param bool $packedBySender
+     * @param bool $packedBySender упаковка відправлення відправником,
+     * якщо packedBySender true відправник отримує додаткову знижку 2%,
+     * тільки для групових відправлень
+     *
      * @return Shipment
      */
     public function setPackedBySender($packedBySender)
@@ -1350,7 +1509,7 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @return string
+     * @return string Напрямок відправлення, містить id - ідентифікатор, name - назву та description - опис
      */
     public function getDirection()
     {
@@ -1358,7 +1517,9 @@ class Shipment extends EntityBase
     }
 
     /**
-     * @param string $direction
+     * @param string $direction Напрямок відправлення,
+     * містить id - ідентифікатор, name - назву та description - опис
+     *
      * @return Shipment
      */
     public function setDirection($direction)

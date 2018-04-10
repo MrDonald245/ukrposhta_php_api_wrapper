@@ -278,6 +278,8 @@ class UkrposhtaApi
      */
     private function request($method, $route, $params = null)
     {
+        $params_in_json = json_encode($params);
+
         $full_url = $this->getFullUrl($route);
         $ch = curl_init($full_url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);

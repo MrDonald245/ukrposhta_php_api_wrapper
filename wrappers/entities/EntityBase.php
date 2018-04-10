@@ -26,20 +26,24 @@ abstract class EntityBase
     /**
      * @return array
      */
-    protected function objectToArray() {
+    protected function objectToArray()
+    {
         $reflectionClass = new ReflectionClass(get_class($this));
         $array = [];
 
         foreach ($reflectionClass->getProperties() as $property) {
             $property->setAccessible(true);
-            $array[$property->getName()] = $property->getValue($this);
+            if ($property->getValue($this) != null) {
+                $array[$property->getName()] = $property->getValue($this);
+            }
             $property->setAccessible(false);
         }
 
         return $array;
     }
 
-    protected function arrayToObject($array) {
+    protected function arrayToObject($array)
+    {
         foreach ($array as $key => $value) {
             $this->{$key} = $value;
         }

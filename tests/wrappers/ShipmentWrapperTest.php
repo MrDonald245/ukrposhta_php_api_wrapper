@@ -25,5 +25,52 @@ class ShipmentWrapperTest extends PHPUnit_Framework_TestCase
             'ba5378df-985e-49c5-9cf3-d222fa60aa68');
     }
 
+    public function testCreate()
+    {
+        $address = $this->createAddress();
+        $sender = $this->createClient($address->getId());
+        $recipient = $this->createClient($address->getId());
 
+        $shipment = new Shipment([
+            'sender' => ['uuid' => $sender->getUuid()],
+            'recipient' => ['uuid' => $recipient->getUuid()],
+            'deliveryType' => Shipment::DELIVERY_TYPE_W2D,
+            'paidByRecipient' => true,
+            'nonCashPayment' => false,
+            'parcels' => [['weight' => 1200, 'length' => 170]],
+        ]);
+
+        $created_shipment = $this->wrapper->shipment()->create($shipment);
+    }
+
+    /**
+     * @return Address
+     */
+    private function createAddress()
+    {
+        return $this->wrapper->address()->create(['postcode' => '07401',
+            'country' => 'UA',
+            'region' => 'Київська',
+            'city' => 'Бровари',
+            'district' => 'Київський',
+            'street' => 'Котляревського',
+            'houseNumber' => '12',
+            'apartmentNumber' => '33']);
+    }
+
+    /**
+     * @param int $addressId
+     * @return Client
+     */
+    private function createClient($addressId)
+    {
+        return $this->wrapper->client()->create([
+            'name' => 'ТОВ Експресс Банк',
+            'uniqueRegistrationNumber' => '0035',
+            'addressId' => $addressId,
+            'phoneNumber' => '067 123 12 34',
+            'resident' => true,
+            'edrpou' => '20053145',
+            'email' => 'test@test.com',]);
+    }
 }

@@ -23,5 +23,15 @@ class ShipmentWrapper extends UkrposhtaApiWrapper
         parent::__construct($bearer, $token);
     }
 
+    /**
+     * @param Shipment|array $shipment
+     * @return Shipment
+     */
+    public function create($shipment)
+    {
+        $data = $this->entityToArray($shipment);
 
+        $shipment_array = $this->api->method('POST')->params($data)->shipments();
+        return new Shipment($shipment_array);
+    }
 }
