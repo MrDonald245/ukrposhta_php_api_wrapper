@@ -137,18 +137,6 @@ class UkrposhtaApiTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * Delete client
-     *
-     * @depends testGetClient
-     * @param array $client
-     */
-    public function testDeleteClient($client)
-    {
-        // TODO: this method does not work
-        $this->api->method('DELETE')->action('deleteClient')->clients($client['uuid']);
-    }
-
-    /**
      * @depends testCreateClient
      * @param array $client
      * @return array $client

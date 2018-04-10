@@ -50,7 +50,6 @@ class UkrposhtaApi
             ],
             'put' => 'clients/{client_uuid}?token={token}',
             'delete' => [
-                'deleteClient' => 'clients/{client_uuid}?token={token}',
                 'deletePhone' => 'client-phones/{phoneNumberUuid}?token={token}',
                 'deleteAddress' => 'client-addresses/{addressUuid}?token={token}',
             ],
