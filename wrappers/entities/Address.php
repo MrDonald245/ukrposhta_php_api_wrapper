@@ -103,7 +103,7 @@ class Address extends EntityBase
     /**
      * EntityBase constructor.
      *
-     * @param array|string|null data
+     * @param array|string|null data Could be as an array, json, or null
      */
     public function __construct($data = null)
     {
