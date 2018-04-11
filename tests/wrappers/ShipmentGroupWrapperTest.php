@@ -25,6 +25,9 @@ class ShipmentGroupWrapperTest extends PHPUnit_Framework_TestCase
             'ba5378df-985e-49c5-9cf3-d222fa60aa68');
     }
 
+    /**
+     * @return ShipmentGroup
+     */
     public function testCreate()
     {
         $address = $this->createAddress();
@@ -55,6 +58,7 @@ class ShipmentGroupWrapperTest extends PHPUnit_Framework_TestCase
     /**
      * @depends testCreate
      * @param ShipmentGroup $shipmentGroup
+     * @return Shipment
      */
     public function testAddShipment($shipmentGroup)
     {
@@ -62,6 +66,42 @@ class ShipmentGroupWrapperTest extends PHPUnit_Framework_TestCase
         $result = $this->wrapper->shipmentGroup()
             ->addShipment($shipment->getUuid(), $shipmentGroup->getUuid());
         $this->assertArrayHasKey('message', $result);
+
+        return $this->wrapper->shipment()->getByUuid($shipment->getUuid());
+    }
+
+    /**
+     * @depends testCreate
+     * @param ShipmentGroup $shipmentGroup
+     */
+    public function testGet($shipmentGroup)
+    {
+        $fetched_shipment_group = $this->wrapper->shipmentGroup()->get($shipmentGroup->getUuid());
+        $this->assertEquals($shipmentGroup->getUuid(), $fetched_shipment_group->getUuid());
+    }
+
+    /**
+     * @depends testCreate
+     * @param ShipmentGroup $shipmentGroup
+     */
+    public function testGetByClientUuid($shipmentGroup)
+    {
+        $first_fetched_shipment_group = $this->wrapper->shipmentGroup()
+            ->getByClientUuid($shipmentGroup->getClientUuid())[0];
+
+        $this->assertEquals(true,$first_fetched_shipment_group->getUuid() != null);
+    }
+
+    /**
+     * @depends testAddShipment
+     * @param Shipment $shipment
+     */
+    public function testDeleteShipment($shipment)
+    {
+        $this->wrapper->shipmentGroup()->deleteShipment($shipment->getUuid());
+        $fetched_shipment = $this->wrapper->shipment()->getByUuid($shipment->getUuid());
+
+        $this->assertEquals(true, $fetched_shipment->getShipmentGroupUuid() == null);
     }
 
     /**

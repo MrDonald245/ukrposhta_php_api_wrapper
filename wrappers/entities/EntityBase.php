@@ -42,6 +42,10 @@ abstract class EntityBase
         return $array;
     }
 
+    /**
+     * @param array $array
+     * @return void
+     */
     protected function arrayToObject($array)
     {
         foreach ($array as $key => $value) {

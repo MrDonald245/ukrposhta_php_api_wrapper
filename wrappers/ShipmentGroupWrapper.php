@@ -61,4 +61,44 @@ class ShipmentGroupWrapper extends UkrposhtaApiWrapper
 
         return $shipment_group_array;
     }
+
+    /**
+     * @param string $shipmentGroupUuid
+     * @return ShipmentGroup
+     */
+    public function get($shipmentGroupUuid)
+    {
+        $shipment_group_array = $this->api->method('GET')
+            ->action('get')
+            ->shipmentGroups($shipmentGroupUuid);
+
+        return new ShipmentGroup($shipment_group_array);
+    }
+
+    /**
+     * @param string $clientUuid
+     * @return ShipmentGroup[]
+     */
+    public function getByClientUuid($clientUuid)
+    {
+        $shipment_groups_array = $this->api->method('GET')
+            ->action('getByClientUuid')
+            ->shipmentGroups($clientUuid);
+
+        $shipment_groups = [];
+        foreach ($shipment_groups_array as $shipment_group_array) {
+            $shipment_groups[] = new ShipmentGroup($shipment_group_array);
+        }
+
+        return $shipment_groups;
+    }
+
+    /**
+     * @param string $shipmentUuid
+     * @return void
+     */
+    public function deleteShipment($shipmentUuid)
+    {
+        $this->api->method('DELETE')->shipmentGroups($shipmentUuid);
+    }
 }
