@@ -10,6 +10,8 @@ require_once 'entities/Address.php';
 require_once 'ClientWrapper.php';
 require_once 'AddressWrapper.php';
 require_once 'ShipmentWrapper.php';
+require_once 'PrintFormWrapper.php';
+require_once 'ShipmentGroupWrapper.php';
 
 /**
  * Wraps the API for Ukrposhta
@@ -65,6 +67,14 @@ class UkrposhtaApiWrapper
         return new ShipmentGroupWrapper($this->api->getBearer(), $this->api->getToken());
     }
 
+    /**
+     * @return PrintFormWrapper
+     */
+    public function printForm()
+    {
+        return new PrintFormWrapper($this->api->getBearer(), $this->api->getToken());
+    }
+    
     /**
      * @param EntityBase $entity
      * @return array|EntityBase

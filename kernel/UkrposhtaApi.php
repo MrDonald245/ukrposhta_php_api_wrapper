@@ -15,6 +15,7 @@
  * @method array clients(...$arguments)
  * @method array shipments(...$arguments)
  * @method array shipmentGroups(...$arguments)
+ * @method string printForm(...$arguments)
  */
 class UkrposhtaApi
 {
@@ -71,7 +72,16 @@ class UkrposhtaApi
             ],
             'put' => 'shipment-groups/{shipment_uuid}?token={token}',
             'delete' => 'shipments/{shipmentUuid}/shipment-group?token={token}',
-        ]
+        ],
+        'printForm' => [
+            'get' => [
+                'shipmentLabel' => 'shipments/{shipment_uuid}/label?token={token}',
+                'shipmentSticker' => 'shipments/{shipment_uuid}/sticker?token={token}',
+                'shipmentGroupLabel' => 'shipment-groups/{shipment_group_uuid}/label?token={token}',
+                'shipmentGroupSticker' => 'shipment-groups/{shipment_group_uuid}/sticker?token={token}',
+                'shipmentGroup103a' => 'shipment-groups/{shipment_group_uuid}/form103a?token={token}',
+             ]
+        ],
     ];
 
     /**
@@ -195,7 +205,7 @@ class UkrposhtaApi
      * @throws BadMethodCallException if there is no such method or request is invalid
      * @throws Exception with curl error message
      *
-     * @return array
+     * @return array|string
      */
     public function __call($name, $arguments)
     {
@@ -257,13 +267,17 @@ class UkrposhtaApi
     /**
      * Execute request to UkrPoshta API
      *
-     * @return array
+     * @return array|string
      * @throws Exception with curl error message
      */
     public function execute()
     {
-        $json = $this->request($this->method, $this->route, $this->params);
-        return json_decode($json, true);
+        $result = $this->request($this->method, $this->route, $this->params);
+        if ($this->isJson($result)) {
+            $result = json_decode($result, true);
+        }
+
+        return $result;
     }
 
     /**
@@ -278,8 +292,6 @@ class UkrposhtaApi
      */
     private function request($method, $route, $params = null)
     {
-        $params_in_json = json_encode($params);
-
         $full_url = $this->getFullUrl($route);
         $ch = curl_init($full_url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
